@@ -25,6 +25,8 @@ export function parseYen(input: string | null | undefined): number | null {
     s = s.slice(1);
   }
   s = s.replace(/\((税込|税抜|税込み)\)$/, "").replace(/(円|-|―|也)+$/, "");
+  // OCR が桁区切りの「,」を「.」と読んだもの（3桁ずつ）も金額として読む（円に小数は無い）
+  if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, ",");
   if (!/^\d{1,3}(,\d{3})*$|^\d+$/.test(s)) return null;
   const n = Number(s.replace(/,/g, ""));
   if (!Number.isSafeInteger(n)) return null;

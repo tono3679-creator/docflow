@@ -11,8 +11,8 @@ test.afterEach(async ({ page }) => {
 
 test("要確認の書類を確認して確定する（OCR の信頼度が低い項目）", async ({ page }) => {
   await startDemo(page, "staff");
-  await openDocument(page, "はやて交通");
-  await expect(page.locator("h1")).toHaveText(/領収書_はやて交通_タクシー\.png/);
+  await openDocument(page, "知恵の森書店");
+  await expect(page.locator("h1")).toHaveText(/領収書_知恵の森書店_低解像度\.jpg/);
 
   // 原本（画像）が表示され、要確認の項目に印が出る
   const viewer = page.getByTestId("viewer-scroll");

@@ -19,7 +19,8 @@ type Candidate = { value: string; raw: string; source: SourceRef | null; priorit
 // ---------------------------------------------------------------
 // 値の形
 // ---------------------------------------------------------------
-const AMOUNT_RE = /(?<![\d.\-/:])(?:[△▲\-−])?¥?\s?(?:\d{1,3}(?:,\s?\d{3})+|\d+)(?![\d%/.:年月日])(?:\s?円)?-?/g;
+// 桁区切りは「,」。OCR が「,」を「.」と読んだもの（「1.660」）も、3桁ずつのときは桁区切りとして読む（円に小数は無い）
+const AMOUNT_RE = /(?<![\d.\-/:])(?:[△▲\-−])?¥?\s?(?:\d{1,3}(?:,\s?\d{3})+|\d{1,3}(?:\.\d{3})+(?![\d.])|\d+)(?![\d%/.:年月日])(?:\s?円)?-?/g;
 const DATE_RE = /(?:\d{4}\s?[年/.\-]\s?\d{1,2}\s?[月/.\-]\s?\d{1,2}\s?日?|(?:令和|R|平成|H)\s?(?:\d{1,2}|元)\s?[年/.\-]\s?\d{1,2}\s?[月/.\-]\s?\d{1,2}\s?日?)/g;
 const CODE_RE = /[A-Za-z0-9][A-Za-z0-9\-_/]{1,30}/g;
 const REG_RE = /T\s?\d(?:[\s\-]?\d){12}/g;
@@ -98,7 +99,11 @@ const compactOf = (text: string) => text.replace(/\s/g, "");
 
 /** 値の前に日本語の語が2文字以上あれば、別のラベルの行とみなす（「消費税(10%)」の 10 を小計と読まない） */
 function labelledElsewhere(text: string, start: number): boolean {
-  return (text.slice(0, start).match(CJK_RE)?.length ?? 0) >= 2;
+  let before = text.slice(0, start);
+  // 大きな字の「¥」を OCR が日本語の1〜2文字に読み違えたもの（「ぞそ1,800-」「羊5,800」）は、ラベルの語に数えない。
+  // 行の先頭から数字の直前までがその1〜2文字だけで、値が桁区切りの金額のときに限る
+  if (/^\s*[^\s\d]{1,2}\s*$/.test(before) && /^\d{1,3}(,\s?\d{3})+/.test(text.slice(start))) before = "";
+  return (before.match(CJK_RE)?.length ?? 0) >= 2;
 }
 
 // ---------------------------------------------------------------
@@ -109,7 +114,7 @@ function rowLines(lp: LayoutPage, row: number): Line[] {
 }
 
 /** ラベルの後ろ（同じ行の残り → 同じ段の右の行 → すぐ下の行）から値を探す */
-function valueNear(lp: LayoutPage, line: Line, labelEnd: number, kind: Kind, excluded: Set<string>): { line: Line; start: number; end: number; value: string } | null {
+function valueNear(lp: LayoutPage, line: Line, labelEnd: number, kind: Kind, excluded: Set<string>, below = true): { line: Line; start: number; end: number; value: string } | null {
   const rest = line.text.slice(labelEnd);
   const same = findValue(kind, rest);
   if (same && (kind !== "text" || same.value.length > 0)) return { line, start: labelEnd + same.start, end: labelEnd + same.end, value: same.value };
@@ -120,12 +125,13 @@ function valueNear(lp: LayoutPage, line: Line, labelEnd: number, kind: Kind, exc
     if (v) return { line: r, ...v };
     if (kind === "text") break;
   }
+  if (!below) return null;
   // 下：ラベルと横位置が重なる、近い行
-  const below = lp.lines
+  const belowLines = lp.lines
     .filter((l) => !excluded.has(l.id) && l.box.y > line.box.y + line.box.h * 0.5 && l.box.y - (line.box.y + line.box.h) < line.box.h * 2.2)
     .filter((l) => l.box.x < line.box.x + line.box.w + 0.02 && l.box.x + l.box.w > line.box.x - 0.02)
     .sort((a, b) => a.box.y - b.box.y);
-  for (const b of below.slice(0, 1)) {
+  for (const b of belowLines.slice(0, 1)) {
     const v = findValue(kind, b.text);
     if (v && kind !== "text" && labelledElsewhere(b.text, v.start)) break;
     if (v) return { line: b, ...v };
@@ -141,6 +147,8 @@ type FieldRule = { key: string; kind: Kind; labels: LabelSpec[] };
 
 const NUMBER_EXCLUDE = /(登録番号|電話|TEL|FAX|口座|郵便|〒)/i;
 const TOTAL_EXCLUDE = /(小計|対象|税抜|数量|点数|件数|明細)/;
+/** 「No.」のラベル（OCR が値の前に付けた「(」「:」も許す：「No. (CM-3391」） */
+const NO_LABEL = /(?<![A-Za-z])No\.?(?=[(（:：]?[A-Za-z0-9])/;
 
 const COMMON_RULES: FieldRule[] = [
   { key: "registration_number", kind: "reg_no", labels: [{ re: /(適格請求書発行事業者)?登録番号/, strong: true }] },
@@ -152,23 +160,24 @@ const COMMON_RULES: FieldRule[] = [
 
 const RULES: Record<KnownType, FieldRule[]> = {
   invoice: [
-    { key: "invoice_number", kind: "code", labels: [{ re: /請求書?(番号|No\.?)/i, strong: true, exclude: NUMBER_EXCLUDE }, { re: /Invoice\s?No\.?/i }, { re: /(?<![A-Za-z])No\.?(?=\s?[A-Za-z0-9])/, exclude: NUMBER_EXCLUDE }] },
+    { key: "invoice_number", kind: "code", labels: [{ re: /請求書?(番号|No\.?)/i, strong: true, exclude: NUMBER_EXCLUDE }, { re: /Invoice\s?No\.?/i }, { re: NO_LABEL, exclude: NUMBER_EXCLUDE }] },
     { key: "issue_date", kind: "date", labels: [{ re: /(請求日|発行日|発行年月日)/, strong: true }, { re: /日付/ }] },
-    { key: "due_date", kind: "date", labels: [{ re: /(お?支払(い)?期(限|日)|お?振込期(限|日)|支払予定日)/, strong: true }] },
+    { key: "due_date", kind: "date", labels: [{ re: /(お?支払(い)?期(限|日)|お?振込期(限|日)|支払予定日)/, strong: true }, { re: /お?支払い?.限/ }] },
     ...COMMON_RULES,
     { key: "total_amount", kind: "amount", labels: [{ re: /ご?請求金額/, strong: true, exclude: TOTAL_EXCLUDE }, { re: /(税込)?合計金額/, strong: true, exclude: TOTAL_EXCLUDE }, { re: /総合計/, strong: true }, { re: /合計/, strong: true, exclude: TOTAL_EXCLUDE }] },
     { key: "notes", kind: "text", labels: [{ re: /備考/ }] },
   ],
   receipt: [
-    { key: "receipt_number", kind: "code", labels: [{ re: /領収書?(番号|No\.?)/i, strong: true, exclude: NUMBER_EXCLUDE }, { re: /(?<![A-Za-z])No\.?(?=\s?[A-Za-z0-9])/, exclude: NUMBER_EXCLUDE }] },
+    { key: "receipt_number", kind: "code", labels: [{ re: /領収書?(番号|No\.?)/i, strong: true, exclude: NUMBER_EXCLUDE }, { re: NO_LABEL, exclude: NUMBER_EXCLUDE }] },
     { key: "issue_date", kind: "date", labels: [{ re: /(発行日|領収日|発行年月日)/, strong: true }, { re: /日付/ }] },
     ...COMMON_RULES,
     { key: "total_amount", kind: "amount", labels: [{ re: /領収金額/, strong: true }, { re: /(税込)?合計(金額)?/, strong: true, exclude: TOTAL_EXCLUDE }, { re: /金額/, exclude: /(対象|税|小計)/ }] },
     { key: "payment_method", kind: "text", labels: [{ re: /(お)?支払(い)?方法/ }] },
-    { key: "purpose", kind: "text", labels: [{ re: /但し書?き?/ }, { re: /^但/ }] },
+    // 「但し書籍代として」の「書」をラベルに含めない（「但し書き」「但書」「但し書：」だけをラベルの語とみなす）
+    { key: "purpose", kind: "text", labels: [{ re: /但し書き|但し書(?=[:：])|但書き?|但し/ }, { re: /^但/ }] },
   ],
   delivery_note: [
-    { key: "delivery_number", kind: "code", labels: [{ re: /納品書?(番号|No\.?)/i, strong: true, exclude: NUMBER_EXCLUDE }, { re: /伝票(番号|No\.?)/ }, { re: /(?<![A-Za-z])No\.?(?=\s?[A-Za-z0-9])/, exclude: NUMBER_EXCLUDE }] },
+    { key: "delivery_number", kind: "code", labels: [{ re: /納品書?(番号|No\.?)/i, strong: true, exclude: NUMBER_EXCLUDE }, { re: /伝票(番号|No\.?)/ }, { re: NO_LABEL, exclude: NUMBER_EXCLUDE }] },
     { key: "delivery_date", kind: "date", labels: [{ re: /納品日/, strong: true }, { re: /(発行日|日付)/ }] },
     ...COMMON_RULES,
     { key: "total_amount", kind: "amount", labels: [{ re: /(税込)?合計金額/, strong: true, exclude: TOTAL_EXCLUDE }, { re: /総合計/, strong: true }, { re: /合計/, strong: true, exclude: TOTAL_EXCLUDE }] },
@@ -183,8 +192,9 @@ type ColKey = "description" | "quantity" | "unit" | "unit_price" | "amount" | "t
 const HEADER: Record<ColKey, RegExp> = {
   description: /(品名|品目|摘要|内容|商品名|品番・品名|項目|件名)/,
   quantity: /(数量|数)/,
-  unit: /単位/,
-  unit_price: /単価/,
+  // OCR が「単」を読み違えることがある（「除位」「南価」）。見出しの行の中でだけ使うので「位」「価」の1文字で見分ける
+  unit: /(単位|位)/,
+  unit_price: /(単価|価(?!格))/,
   amount: /(金額|価格)/,
   tax_rate: /(税率|税区分)/,
 };
@@ -331,13 +341,39 @@ function parseTable(lp: LayoutPage, startIndex: number): TableResult | null {
       } else push("quantity", q.text || null, cellSource(lp, q), q.text);
     } else push("quantity", null, null);
 
+    // 単位の列に、となりの単価がくっついて読まれたとき（「本2,800」）は分ける（単価の列が空のときだけ）
     const u = get("unit");
-    if (u && u.text) push("unit", u.text, cellSource(lp, u));
+    let priceFromUnit: { text: string; source: SourceRef | null } | null = null;
+    let unitText = u?.text ?? "";
+    let unitSource = u ? cellSource(lp, u) : null;
+    const UNIT_PRICE = /^([^\d\s.,]{1,3})(\d{1,3}(?:,\d{3})+|\d+)$/;
+    if (u && !get("unit_price")) {
+      const m = UNIT_PRICE.exec(u.text);
+      if (m) {
+        unitText = m[1];
+        unitSource = cellSource(lp, u, 0, m[1].length);
+        priceFromUnit = { text: m[2], source: cellSource(lp, u, m[1].length, u.text.length) };
+      }
+    } else if (!u && unitFromQty && q && !get("unit_price")) {
+      // 数量の列に「4本2,800」（数量・単位・単価）が入ったとき
+      const m = UNIT_PRICE.exec(unitFromQty.text);
+      if (m) {
+        const from = q.text.length - unitFromQty.text.length;
+        unitFromQty = { text: m[1], source: cellSource(lp, q, from, from + m[1].length) };
+        priceFromUnit = { text: m[2], source: cellSource(lp, q, from + m[1].length, q.text.length) };
+      }
+    }
+    if (u && unitText) push("unit", unitText, unitSource);
     else if (unitFromQty) push("unit", unitFromQty.text, unitFromQty.source);
     else push("unit", null, null);
 
     for (const [key, col] of [["unit_price", "unit_price"], ["amount", "amount"]] as const) {
       const c = get(col);
+      if (!c && key === "unit_price" && priceFromUnit) {
+        const v = parseDecimalMilli(priceFromUnit.text);
+        push(key, v === null ? null : milliToString(v), priceFromUnit.source);
+        continue;
+      }
       if (!c) {
         push(key, null, null);
         continue;
@@ -404,8 +440,15 @@ export function extractWithRules(pages: LayoutPage[], type: KnownType): { fields
         const m = matchLabel(label.re, line.text);
         if (!m) continue;
         if (rule.key === "tax_amount" && isRateBreakdown(lp, line, m.index)) continue;
-        const found = valueNear(lp, line, m.end, rule.kind, excluded);
+        let found = valueNear(lp, line, m.end, rule.kind, excluded);
         if (!found) continue;
+        // 「消費税 10め ¥5,670」：ラベルのすぐ後の 10・8 は税率（「%」を読み違えたもの）。同じ段のその先に金額があればそちらを使う
+        if (rule.key === "tax_amount" && (found.value === "10" || found.value === "8")) {
+          const after = found.line.text.slice(found.end);
+          const rateLike = (found.line === line && found.start - m.end <= 2) || /^[^\s\d円\-]/.test(after);
+          const next = rateLike ? valueNear(lp, found.line, found.end, rule.kind, excluded, false) : null;
+          if (next) found = next;
+        }
         if (rule.kind === "text") {
           let v = found.line.text.slice(found.start, found.end).replace(/^[\s:：]+/, "").trim();
           if (rule.key === "purpose") v = v.replace(/^し\s?/, "");
@@ -464,7 +507,7 @@ export function extractWithRules(pages: LayoutPage[], type: KnownType): { fields
   const firstPage = all.filter((r) => r.lp === pages[0]);
   let recipient: ExtractedField = { key: "recipient_name", line: null, value: null, source: null };
   for (const { lp, line } of firstPage) {
-    const m = /^(?:(?:請求先|納品先|宛名|お客様名?)[\s:：]*)?(.+?)\s?(御中|様|殿)/.exec(line.text);
+    const m = /^(?:(?:請求先|納品先|宛名|お客様名?)[\s:：]*)?(.+?)\s?(御\s?中|様|殿)/.exec(line.text);
     if (!m || m[1].length < 2) continue;
     const name = m[1].trim();
     const start = line.text.indexOf(name);
@@ -482,7 +525,7 @@ export function extractWithRules(pages: LayoutPage[], type: KnownType): { fields
     let best: { score: number; ref: LRef } | null = null;
     for (const ref of all) {
       const t = ref.line.text;
-      if (!COMPANY_RE.test(compactOf(t)) || /(御中|様|殿)/.test(t) || t.length > 40 || /[:：]/.test(t)) continue;
+      if (!COMPANY_RE.test(compactOf(t)) || /(御\s?中|様|殿)/.test(t) || t.length > 40 || /[:：]/.test(t)) continue;
       if (recipient.value && t.includes(recipient.value)) continue;
       if (/(銀行|支店|口座|名義)/.test(t)) continue;
       let score = 1;

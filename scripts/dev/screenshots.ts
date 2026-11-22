@@ -8,9 +8,9 @@ import { mkdirSync } from "node:fs";
 import { chromium, type Browser, type BrowserContext, type Page } from "playwright";
 
 const BASE = process.env.BASE_URL ?? "http://localhost:3000";
-/** 紹介ページの最初の画像：スキャンした請求書（黄色＝信頼度が低い、赤＝金額が合わない） */
+/** 紹介ページの最初の画像：スキャンした請求書（黄色＝信頼度が低い。金額が合わない確認事項があれば選ぶ） */
 const HERO_DOC = "大和梱包資材_スキャン";
-const MOBILE_DOC = "はやて交通";
+const MOBILE_DOC = "知恵の森書店";
 
 async function start(browser: Browser, mobile: boolean, persona: "管理者" | "担当者" = "担当者"): Promise<{ ctx: BrowserContext; page: Page }> {
   const ctx = await browser.newContext({

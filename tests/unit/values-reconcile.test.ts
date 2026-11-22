@@ -12,6 +12,12 @@ describe("値の解釈", () => {
     expect(parseYen("△500")).toBe(-500);
     expect(parseYen("(1,200)")).toBe(-1200);
   });
+  it("金額：OCR が桁区切りの「,」を「.」と読んだもの（3桁ずつ）は読む。それ以外の「.」は読まない", () => {
+    expect(parseYen("1.660")).toBe(1660);
+    expect(parseYen("¥1.234.567")).toBe(1234567);
+    expect(parseYen("1.66")).toBeNull();
+    expect(parseYen("12.5")).toBeNull();
+  });
   it("金額：OCR の誤読らしい文字は直さずに null（推測しない）", () => {
     expect(parseYen("1l0,800")).toBeNull();
     expect(parseYen("11,08")).toBeNull();

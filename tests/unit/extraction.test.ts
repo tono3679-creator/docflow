@@ -57,6 +57,22 @@ describe("ルール抽出（デモ書類の実際の読取結果から）", asyn
     expect(invented).toEqual([]);
   });
 
+  it("画像・スキャンの書類（読み取れない画像を除く）：見出しの項目の 93% 以上が正解", async () => {
+    let total = 0;
+    let correct = 0;
+    for (const t of truth.filter((x) => x.render !== "pdf" && x.render !== "jpeg_unreadable")) {
+      const { pages } = await load(t.id);
+      const r = await analyzePages(pages, { allowLlm: false });
+      for (const [key, expected] of Object.entries(t.fields)) {
+        if (expected === null) continue;
+        total++;
+        const got = r.output.fields.find((f) => f.line === null && f.key === key);
+        if (got?.value && compactKey(got.value) === compactKey(expected)) correct++;
+      }
+    }
+    expect(correct / total).toBeGreaterThanOrEqual(0.93);
+  });
+
   it("文字の無いページは種別不明・項目なし（推測しない）", async () => {
     const r = await analyzePages([{ page: 1, width: 600, height: 800, source: "ocr", engine: "test", words: [] }]);
     expect(r.output.documentType).toBe("unknown");
@@ -182,5 +198,53 @@ describe("AI による抽出（応答を模擬）", () => {
     setLlmForTests(fake(goodOutput({ document_type: "receipt" })));
     const r = await analyzePages([PAGE], { allowLlm: true, forcedType: "invoice" });
     expect(r.output.documentType).toBe("invoice");
+  });
+});
+
+// ---------------------------------------------------------------
+// OCR のよくある読み違い（実際のデモのスキャン画像で起きたもの）
+// ---------------------------------------------------------------
+describe("OCR の読み違いへの対応", () => {
+  const ocrWord = (text: string, x: number, y: number) => ({ text, box: { x, y, w: 0.014 * text.length, h: 0.02 }, conf: 0.9 });
+  const ocrPage = (words: ReturnType<typeof ocrWord>[]): PageText => ({ page: 1, width: 1000, height: 1400, source: "ocr", engine: "test", words });
+  const field = (r: Awaited<ReturnType<typeof analyzePages>>, key: string, line: number | null = null) => r.output.fields.find((f) => f.key === key && f.line === line)?.value ?? null;
+
+  it("大きな「¥」を日本語の文字に読み違えた金額・「No. (」・「但し書籍代」", async () => {
+    const r = await analyzePages([ocrPage([
+      ocrWord("領収書", 0.45, 0.05),
+      ocrWord("No.", 0.7, 0.1), ocrWord("(CM-3391", 0.75, 0.1),
+      ocrWord("株式会社山田商事", 0.1, 0.15), ocrWord("様", 0.32, 0.15),
+      ocrWord("領収金額", 0.1, 0.25), ocrWord("ぞそ6,", 0.4, 0.25), ocrWord("380-", 0.49, 0.25),
+      ocrWord("但し", 0.1, 0.3), ocrWord("書籍代として", 0.15, 0.3),
+      ocrWord("税抜金額", 0.1, 0.4), ocrWord("羊5,", 0.4, 0.4), ocrWord("800", 0.45, 0.4),
+      ocrWord("消費税", 0.1, 0.45), ocrWord("10め", 0.2, 0.45), ocrWord("¥580", 0.4, 0.45),
+    ])], { allowLlm: false });
+    expect(r.output.documentType).toBe("receipt");
+    expect(field(r, "receipt_number")).toBe("CM-3391");
+    expect(field(r, "total_amount")).toBe("6380");
+    expect(field(r, "subtotal")).toBe("5800");
+    expect(field(r, "tax_amount")).toBe("580");
+    expect(field(r, "purpose")).toBe("書籍代として");
+  });
+
+  it("消費税の後ろに金額が無ければ、税率と読み違えたかもしれない 10 もそのまま使う（捨てない）", async () => {
+    const r = await analyzePages([ocrPage([
+      ocrWord("領収書", 0.45, 0.05),
+      ocrWord("消費税", 0.1, 0.45), ocrWord("10", 0.2, 0.45),
+    ])], { allowLlm: false });
+    expect(field(r, "tax_amount")).toBe("10");
+  });
+
+  it("明細の見出しの「単」の読み違い（除位・南価）と、単位と単価がくっついた読み取り", async () => {
+    const r = await analyzePages([ocrPage([
+      ocrWord("納品書", 0.45, 0.05),
+      ocrWord("品名", 0.1, 0.3), ocrWord("数量", 0.5, 0.3), ocrWord("除位", 0.58, 0.3), ocrWord("南価", 0.72, 0.3), ocrWord("金額", 0.88, 0.3),
+      ocrWord("清掃用洗剤", 0.1, 0.34), ocrWord("4", 0.53, 0.34), ocrWord("本2,800", 0.6, 0.34), ocrWord("11.200", 0.88, 0.34),
+      ocrWord("小計", 0.6, 0.45), ocrWord("¥11,200", 0.85, 0.45),
+    ])], { allowLlm: false });
+    expect(field(r, "quantity", 0)).toBe("4");
+    expect(field(r, "unit", 0)).toBe("本");
+    expect(field(r, "unit_price", 0)).toBe("2800");
+    expect(field(r, "amount", 0)).toBe("11200");
   });
 });

@@ -84,7 +84,7 @@ export default function Home() {
             </div>
           </div>
           <div className="mt-12 overflow-hidden rounded-xl border bg-card">
-            <Image src="/screens/review.png" alt="確認画面。左に原本、右に項目。確認が必要な項目に黄色、計算が合わない項目に赤の印が付いている" width={1440} height={900} priority className="h-auto w-full" />
+            <Image src="/screens/review.png" alt="確認画面。左にスキャンした原本、右に項目。読み取りに自信のない項目に黄色の印が付いている" width={1440} height={900} priority className="h-auto w-full" />
           </div>
         </section>
 
@@ -158,11 +158,11 @@ export default function Home() {
         <Section title="読み取りの精度（実測）">
           <div className="grid gap-3 sm:grid-cols-3">
             <Stat value="220 / 220" label="PDF の見出しの項目" sub="発行元・番号・日付・金額など" />
-            <Stat value="19 / 20" label="読み間違いを「要確認」で検出" sub="画像の読み取りの誤りを含む" />
+            <Stat value="85 / 99" label="スキャン・写真の見出しの項目" sub="ピンぼけで読めない画像1件を含む" />
             <Stat value="0 件" label="書かれていない値を埋めた件数" sub="読めない項目は空欄のまま" />
           </div>
           <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-            ※ 架空のデモ書類 37 件での測定（全項目の正解率 88.4%。低解像度の画像や写真は下がります）。読み取りは間違えることがあるため、人が確認して確定する前提で作っています。
+            ※ 架空のデモ書類 37 件での測定（見出しの項目の正解率 95.6%。誤って読んだ 3 項目のうち 2 項目は「要確認」「不整合」で示しました）。読み取りは間違えることがあるため、人が確認して確定する前提で作っています。
           </p>
         </Section>
 
