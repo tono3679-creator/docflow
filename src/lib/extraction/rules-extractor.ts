@@ -6,10 +6,10 @@
  * 値は原本の文字の位置（単語の座標）と一緒に返す。見つからない項目は null（推測で埋めない）。
  * 同じ項目に違う値の記載が複数あれば conflicts に入れる（矛盾として確認に回す）。
  */
-import { union } from "./geometry";
+import { union, verticalOverlap } from "./geometry";
 import { rangeSource, subBox, type LayoutPage } from "./layout";
 import type { KnownType } from "./schema";
-import { normalizeText, tidySpaces } from "./text";
+import { normalizeChars, tidySpaces } from "./text";
 import type { Box, DocumentContext, ExtractedField, Line, LineItemBox, SourceRef } from "./types";
 import { parseDecimalMilli, milliToString, parseJpDate, parseRegistrationNumber, parseTaxRate, parseYen } from "../validation/values";
 
@@ -188,7 +188,7 @@ const RULES: Record<KnownType, FieldRule[]> = {
 // ---------------------------------------------------------------
 // 明細の表
 // ---------------------------------------------------------------
-type ColKey = "description" | "quantity" | "unit" | "unit_price" | "amount" | "tax_rate";
+export type ColKey = "description" | "quantity" | "unit" | "unit_price" | "amount" | "tax_rate";
 const HEADER: Record<ColKey, RegExp> = {
   description: /(品名|品目|摘要|内容|商品名|品番・品名|項目|件名)/,
   quantity: /(数量|数)/,
@@ -201,7 +201,7 @@ const HEADER: Record<ColKey, RegExp> = {
 // 「※」で始まる行は、軽減税率の印の付いた明細（※ 業務用コーヒー豆）と注記（※印は軽減税率）の両方がある
 const TABLE_END = /^(小計|合計|計|以下余白|消費税|備考|10%対象|8%対象|お?振込先|※印?は|※(軽減|消費税|上記|お支払))/;
 
-type Cell = { words: number[]; text: string };
+export type Cell = { words: number[]; text: string };
 type TableResult = { fields: ExtractedField[]; boxes: LineItemBox[]; usedLines: Set<string>; nextIndex: number };
 
 function cellSource(lp: LayoutPage, cell: Cell, start = 0, end = cell.text.length): SourceRef | null {
@@ -224,7 +224,13 @@ function cellSource(lp: LayoutPage, cell: Cell, start = 0, end = cell.text.lengt
   return box ? { page: lp.page.page, box, text: cell.text.slice(start, end), conf } : null;
 }
 
-function parseTable(lp: LayoutPage, startIndex: number): TableResult | null {
+export type TableColumn = { key: ColKey; left: number; right: number };
+export type TableRow = { lines: Line[]; top: number; bottom: number; cells: Map<ColKey, Cell> };
+/** 明細の表の骨組み：見出しの行・列の範囲（比率）・明細の各行（行の範囲と、列ごとの単語） */
+export type TableGrid = { headerLines: Line[]; headerBottom: number; columns: TableColumn[]; rows: TableRow[] };
+
+/** 明細の表を探し、列と行に分ける（項目の抽出と、OCR のマスごとの読み直しの両方で使う） */
+export function tableGrid(lp: LayoutPage): TableGrid | null {
   const rows = [...new Set(lp.lines.map((l) => l.row))].sort((a, b) => a - b);
   let headerRow = -1;
   let anchors: { key: ColKey; box: Box }[] = [];
@@ -257,20 +263,14 @@ function parseTable(lp: LayoutPage, startIndex: number): TableResult | null {
   const headerLines = rowLines(lp, headerRow);
   const headerBottom = Math.max(...headerLines.map((l) => l.box.y + l.box.h));
   // 列の境目：となりの見出しの間
-  const bounds = anchors.map((a, i) => {
+  const columns: TableColumn[] = anchors.map((a, i) => {
     const left = i === 0 ? 0 : (anchors[i - 1].box.x + anchors[i - 1].box.w + a.box.x) / 2;
     const right = i === anchors.length - 1 ? 1 : (a.box.x + a.box.w + anchors[i + 1].box.x) / 2;
     return { key: a.key, left, right };
   });
-  const usedLines = new Set(headerLines.map((l) => l.id));
-  const fields: ExtractedField[] = [];
-  const boxes: LineItemBox[] = [];
-  let index = startIndex;
+  const out: TableRow[] = [];
   let lastBottom = headerBottom;
   const rowHeights: number[] = [];
-  type Pending = { cells: Map<ColKey, Cell>; box: Box };
-  const items: Pending[] = [];
-
   for (const row of rows.filter((r) => r > headerRow)) {
     const lines = rowLines(lp, row);
     const top = Math.min(...lines.map((l) => l.box.y));
@@ -287,14 +287,73 @@ function parseTable(lp: LayoutPage, startIndex: number): TableResult | null {
       for (const wi of wordIdx) {
         const b = lp.page.words[wi].box;
         const cx = b.x + b.w / 2;
-        const col = bounds.find((c) => cx >= c.left && cx < c.right) ?? bounds[bounds.length - 1];
+        const col = columns.find((c) => cx >= c.left && cx < c.right) ?? columns[columns.length - 1];
         const cell = cells.get(col.key) ?? { words: [], text: "" };
         cell.words.push(wi);
         cell.text += lp.normWords[wi];
         cells.set(col.key, cell);
       }
-      usedLines.add(l.id);
     }
+    out.push({ lines, top, bottom, cells });
+    rowHeights.push(h);
+    lastBottom = bottom;
+  }
+  return { headerLines, headerBottom, columns, rows: out };
+}
+
+const ALNUM = /[A-Za-z0-9¥$%.,\-/]/;
+/** 値として成り立たない読み取り（「)」「:」「も」のような、数字の無い1文字や記号だけ）。値にはせず「未取得」にする */
+const junk = (t: string) => !/\d/.test(t) && (t.length <= 1 || /^[\p{P}\p{S}\s]+$/u.test(t));
+
+/**
+ * マスの文字を表示用に組み立てる。単語の間が空いていれば空白を入れる。
+ * 「コピー用紙 A4 500枚」が「コピー用紙A4500枚」にならないように。日本語どうしの間の空白は最後に tidySpaces で除く。
+ *   PDF の文字情報：単語は原本の空白で区切ったものなので、間が空いていれば空白
+ *   OCR：文字の形の端どうしの間で測るので、ばらつきが大きい。日本語の文のくせに合わせて、
+ *        「11月」「100枚」のような数字→日本語はよほど離れていなければつなげ、「保守 10月分」のような日本語→数字・英字は空白にしやすくする
+ */
+function cellDisplay(lp: LayoutPage, words: number[]): string {
+  const aspect = lp.page.width / lp.page.height;
+  let out = "";
+  let prev: Box | null = null;
+  for (const wi of words) {
+    const t = lp.normWords[wi];
+    const w = lp.page.words[wi];
+    const b = w.box;
+    if (prev && t) {
+      const charH = Math.max(prev.h, b.h) / aspect;
+      const gap = (b.x - (prev.x + prev.w)) / charH;
+      const lastAl = ALNUM.test(out[out.length - 1] ?? "");
+      const nextAl = ALNUM.test(t[0]);
+      let space: boolean;
+      if (verticalOverlap(prev, b) < 0.5) space = true;
+      else if (w.conf === null) space = gap > 0.3;
+      else if (lastAl && nextAl) space = gap > 0.3;
+      else if (lastAl) space = gap > 0.8;
+      else if (nextAl) space = gap > 0.35;
+      else space = gap > 0.45;
+      if (space) out += " ";
+    }
+    out += t;
+    prev = b;
+  }
+  return out;
+}
+
+function parseTable(lp: LayoutPage, startIndex: number): TableResult | null {
+  const grid = tableGrid(lp);
+  if (!grid) return null;
+  const usedLines = new Set(grid.headerLines.map((l) => l.id));
+  const fields: ExtractedField[] = [];
+  const boxes: LineItemBox[] = [];
+  let index = startIndex;
+  let lastBottom = grid.headerBottom;
+  type Pending = { cells: Map<ColKey, Cell>; box: Box };
+  const items: Pending[] = [];
+
+  for (const { lines, top, bottom, cells } of grid.rows) {
+    for (const l of lines) usedLines.add(l.id);
+    const h = bottom - top;
     const rowBox = union(lines.map((l) => l.box)) as Box;
     const hasNumber = [...cells.entries()].some(([k, c]) => k !== "description" && /\d/.test(c.text));
     if (!hasNumber && items.length > 0 && cells.has("description") && top - lastBottom < h * 1.2) {
@@ -307,7 +366,6 @@ function parseTable(lp: LayoutPage, startIndex: number): TableResult | null {
     } else if (hasNumber || cells.has("description")) {
       items.push({ cells, box: rowBox });
     }
-    rowHeights.push(h);
     lastBottom = bottom;
   }
 
@@ -326,7 +384,8 @@ function parseTable(lp: LayoutPage, startIndex: number): TableResult | null {
       const trimmed = descText.replace(/^(※|軽)\s?|\s?(※|軽)$/g, "");
       const start = descText.indexOf(trimmed);
       descText = trimmed;
-      push("description", normalizeText(trimmed) || null, cellSource(lp, desc, start, start + trimmed.length));
+      const display = normalizeChars(cellDisplay(lp, desc.words)).replace(/^(※|軽)\s?|\s?(※|軽)$/g, "").trim();
+      push("description", display || null, cellSource(lp, desc, start, start + trimmed.length));
     } else push("description", null, null);
 
     // 数量（「3台」のように単位が付いていれば分ける）
@@ -338,7 +397,7 @@ function parseTable(lp: LayoutPage, startIndex: number): TableResult | null {
         const v = parseDecimalMilli(m[1]);
         push("quantity", v === null ? null : milliToString(v), cellSource(lp, q, 0, m[1].length));
         if (m[2]) unitFromQty = { text: m[2], source: cellSource(lp, q, m[1].length, q.text.length) };
-      } else push("quantity", q.text || null, cellSource(lp, q), q.text);
+      } else push("quantity", junk(q.text) ? null : q.text || null, cellSource(lp, q), q.text);
     } else push("quantity", null, null);
 
     // 単位の列に、となりの単価がくっついて読まれたとき（「本2,800」）は分ける（単価の列が空のときだけ）
@@ -363,7 +422,7 @@ function parseTable(lp: LayoutPage, startIndex: number): TableResult | null {
         priceFromUnit = { text: m[2], source: cellSource(lp, q, from + m[1].length, q.text.length) };
       }
     }
-    if (u && unitText) push("unit", unitText, unitSource);
+    if (u && unitText && !/^[\p{P}\p{S}\s]+$/u.test(unitText)) push("unit", unitText, unitSource);
     else if (unitFromQty) push("unit", unitFromQty.text, unitFromQty.source);
     else push("unit", null, null);
 
@@ -379,7 +438,7 @@ function parseTable(lp: LayoutPage, startIndex: number): TableResult | null {
         continue;
       }
       const v = key === "amount" ? parseYen(c.text) : parseDecimalMilli(c.text);
-      if (v === null) push(key, c.text || null, cellSource(lp, c), c.text);
+      if (v === null) push(key, junk(c.text) ? null : c.text || null, cellSource(lp, c), c.text);
       else push(key, typeof v === "bigint" ? milliToString(v) : String(v), cellSource(lp, c));
     }
 
@@ -579,9 +638,11 @@ export function extractWithRules(pages: LayoutPage[], type: KnownType): { fields
     hasReducedMarker: /(軽減税率|※印?は軽減|(?<!\d)8%)/.test(fullText) || fields.some((f) => f.key === "tax_rate" && f.value === "8"),
   };
 
-  // 文字の項目：OCR が日本語の文字の間に入れた空白を除く（値の位置はそのまま）
+  // 文字の項目：OCR が日本語の文字の間に入れた空白を除く（値の位置はそのまま）。
+  // PDF の文字情報の空白は原本に書かれた空白なので残す（「ボールペン 黒 10本」）
   for (const f of fields) {
-    if (f.value !== null && TEXT_KEYS.has(f.key)) f.value = tidySpaces(f.value);
+    if (f.value === null || !TEXT_KEYS.has(f.key)) continue;
+    f.value = f.source && f.source.conf === null ? f.value.replace(/\s+/g, " ").trim() : tidySpaces(f.value);
   }
   return { fields: fields.filter((f, i, arr) => arr.findIndex((x) => x.key === f.key && x.line === f.line) === i), lineItems, context };
 }
