@@ -1,0 +1,1624 @@
+[
+  {
+    "id": "I01",
+    "filename": "請求書_東和電材_INV-2026-0085.pdf",
+    "pattern": "正常な請求書",
+    "render": "pdf",
+    "document_type": "invoice",
+    "fields": {
+      "issuer_name": "東和電材株式会社",
+      "recipient_name": "株式会社山田商事",
+      "invoice_number": "INV-2026-0085",
+      "issue_date": "2026-11-20",
+      "due_date": "2026-12-31",
+      "registration_number": "T0000000000011",
+      "total_amount": "144650",
+      "subtotal": "131500",
+      "tax_amount": "13150"
+    },
+    "lines": [
+      {
+        "description": "VVFケーブル 2.0mm×3C 100m",
+        "quantity": "4",
+        "unit": "巻",
+        "unit_price": "12800",
+        "amount": "51200"
+      },
+      {
+        "description": "スイッチボックス 1個用",
+        "quantity": "50",
+        "unit": "個",
+        "unit_price": "180",
+        "amount": "9000"
+      },
+      {
+        "description": "LED照明器具 40W形",
+        "quantity": "12",
+        "unit": "台",
+        "unit_price": "5400",
+        "amount": "64800"
+      },
+      {
+        "description": "配線工事用ステップル",
+        "quantity": "10",
+        "unit": "箱",
+        "unit_price": "650",
+        "amount": "6500"
+      }
+    ],
+    "confirm_days_ago": 0,
+    "copy_of": null
+  },
+  {
+    "id": "I02",
+    "filename": "請求書_丸栄食品_MF-24117.pdf",
+    "pattern": "8%・10% 混在",
+    "render": "pdf",
+    "document_type": "invoice",
+    "fields": {
+      "issuer_name": "丸栄食品株式会社",
+      "recipient_name": "株式会社山田商事",
+      "invoice_number": "MF-24117",
+      "issue_date": "2026-11-15",
+      "due_date": "2026-12-15",
+      "registration_number": "T0000000000014",
+      "total_amount": "34166",
+      "subtotal": "31500",
+      "tax_amount": "2666",
+      "tax_8_base": "24200",
+      "tax_8": "1936",
+      "tax_10_base": "7300",
+      "tax_10": "730"
+    },
+    "lines": [
+      {
+        "description": "業務用コーヒー豆 1kg",
+        "quantity": "6",
+        "unit": "袋",
+        "unit_price": "2400",
+        "amount": "14400"
+      },
+      {
+        "description": "緑茶ティーバッグ 100P",
+        "quantity": "10",
+        "unit": "箱",
+        "unit_price": "980",
+        "amount": "9800"
+      },
+      {
+        "description": "紙コップ 205ml 1000個",
+        "quantity": "2",
+        "unit": "箱",
+        "unit_price": "3200",
+        "amount": "6400"
+      },
+      {
+        "description": "マドラー 1000本",
+        "quantity": "1",
+        "unit": "箱",
+        "unit_price": "900",
+        "amount": "900"
+      }
+    ],
+    "confirm_days_ago": null,
+    "copy_of": null
+  },
+  {
+    "id": "I03",
+    "filename": "請求書_サンライズ印刷_スキャン.png",
+    "pattern": "読みにくい請求番号",
+    "render": "png_blur_number",
+    "document_type": "invoice",
+    "fields": {
+      "issuer_name": "株式会社サンライズ印刷",
+      "recipient_name": "株式会社山田商事",
+      "invoice_number": "SR-2026-0347",
+      "issue_date": "2026-11-10",
+      "due_date": "2026-11-30",
+      "registration_number": "T0000000000012",
+      "total_amount": "114400",
+      "subtotal": "104000",
+      "tax_amount": "10400"
+    },
+    "lines": [
+      {
+        "description": "会社案内パンフレット A4 8P",
+        "quantity": "1000",
+        "unit": "部",
+        "unit_price": "68",
+        "amount": "68000"
+      },
+      {
+        "description": "名刺印刷 100枚",
+        "quantity": "12",
+        "unit": "箱",
+        "unit_price": "1500",
+        "amount": "18000"
+      },
+      {
+        "description": "封筒 長3 社名入り",
+        "quantity": "2000",
+        "unit": "枚",
+        "unit_price": "9",
+        "amount": "18000"
+      }
+    ],
+    "confirm_days_ago": null,
+    "copy_of": null
+  },
+  {
+    "id": "I04",
+    "filename": "請求書_三和工具_0912.pdf",
+    "pattern": "金額不一致",
+    "render": "pdf",
+    "document_type": "invoice",
+    "fields": {
+      "issuer_name": "株式会社三和工具",
+      "recipient_name": "株式会社山田商事",
+      "invoice_number": "SW-0912",
+      "issue_date": "2026-11-18",
+      "due_date": "2026-12-20",
+      "registration_number": "T0000000000019",
+      "total_amount": "110800",
+      "subtotal": "100000",
+      "tax_amount": "10000"
+    },
+    "lines": [
+      {
+        "description": "インパクトドライバー",
+        "quantity": "2",
+        "unit": "台",
+        "unit_price": "24800",
+        "amount": "49600"
+      },
+      {
+        "description": "ドリルビットセット",
+        "quantity": "3",
+        "unit": "セット",
+        "unit_price": "3600",
+        "amount": "10800"
+      },
+      {
+        "description": "作業台 折りたたみ",
+        "quantity": "1",
+        "unit": "台",
+        "unit_price": "39600",
+        "amount": "39600"
+      }
+    ],
+    "confirm_days_ago": null,
+    "copy_of": null
+  },
+  {
+    "id": "I05",
+    "filename": "請求書_グリーンテック設備_GT-1188.pdf",
+    "pattern": "消費税の不整合",
+    "render": "pdf",
+    "document_type": "invoice",
+    "fields": {
+      "issuer_name": "株式会社グリーンテック設備",
+      "recipient_name": "株式会社山田商事",
+      "invoice_number": "GT-1188",
+      "issue_date": "2026-11-12",
+      "due_date": "2026-12-10",
+      "registration_number": "T0000000000015",
+      "total_amount": "109000",
+      "subtotal": "100000",
+      "tax_amount": "9000"
+    },
+    "lines": [
+      {
+        "description": "空調設備点検",
+        "quantity": "1",
+        "unit": "式",
+        "unit_price": "60000",
+        "amount": "60000"
+      },
+      {
+        "description": "フィルター交換",
+        "quantity": "8",
+        "unit": "台",
+        "unit_price": "5000",
+        "amount": "40000"
+      }
+    ],
+    "confirm_days_ago": null,
+    "copy_of": null
+  },
+  {
+    "id": "I06",
+    "filename": "請求書_東和電材_INV-2026-0085(再送).pdf",
+    "pattern": "重複書類（同じファイル）",
+    "render": "pdf",
+    "document_type": "invoice",
+    "fields": {
+      "issuer_name": "東和電材株式会社",
+      "recipient_name": "株式会社山田商事",
+      "invoice_number": "INV-2026-0085",
+      "issue_date": "2026-11-20",
+      "due_date": "2026-12-31",
+      "registration_number": "T0000000000011",
+      "total_amount": "144650",
+      "subtotal": "131500",
+      "tax_amount": "13150"
+    },
+    "lines": [
+      {
+        "description": "VVFケーブル 2.0mm×3C 100m",
+        "quantity": "4",
+        "unit": "巻",
+        "unit_price": "12800",
+        "amount": "51200"
+      },
+      {
+        "description": "スイッチボックス 1個用",
+        "quantity": "50",
+        "unit": "個",
+        "unit_price": "180",
+        "amount": "9000"
+      },
+      {
+        "description": "LED照明器具 40W形",
+        "quantity": "12",
+        "unit": "台",
+        "unit_price": "5400",
+        "amount": "64800"
+      },
+      {
+        "description": "配線工事用ステップル",
+        "quantity": "10",
+        "unit": "箱",
+        "unit_price": "650",
+        "amount": "6500"
+      }
+    ],
+    "confirm_days_ago": null,
+    "copy_of": "I01"
+  },
+  {
+    "id": "I07",
+    "filename": "請求書_ネクストウェブ_NW-2026-031.pdf",
+    "pattern": "正常な請求書",
+    "render": "pdf",
+    "document_type": "invoice",
+    "fields": {
+      "issuer_name": "合同会社ネクストウェブ",
+      "recipient_name": "株式会社山田商事",
+      "invoice_number": "NW-2026-031",
+      "issue_date": "2026-10-31",
+      "due_date": "2026-11-30",
+      "registration_number": "T0000000000016",
+      "total_amount": "102300",
+      "subtotal": "93000",
+      "tax_amount": "9300"
+    },
+    "lines": [
+      {
+        "description": "コーポレートサイト保守 10月分",
+        "quantity": "1",
+        "unit": "式",
+        "unit_price": "55000",
+        "amount": "55000"
+      },
+      {
+        "description": "採用ページ更新",
+        "quantity": "1",
+        "unit": "式",
+        "unit_price": "38000",
+        "amount": "38000"
+      }
+    ],
+    "confirm_days_ago": 18,
+    "copy_of": null
+  },
+  {
+    "id": "I08",
+    "filename": "請求書_ネクストウェブ_再送スキャン.jpg",
+    "pattern": "重複書類（同じ請求番号）",
+    "render": "jpeg_scan",
+    "document_type": "invoice",
+    "fields": {
+      "issuer_name": "合同会社ネクストウェブ",
+      "recipient_name": "株式会社山田商事",
+      "invoice_number": "NW-2026-031",
+      "issue_date": "2026-10-31",
+      "due_date": "2026-11-30",
+      "registration_number": "T0000000000016",
+      "total_amount": "102300",
+      "subtotal": "93000",
+      "tax_amount": "9300"
+    },
+    "lines": [
+      {
+        "description": "コーポレートサイト保守 10月分",
+        "quantity": "1",
+        "unit": "式",
+        "unit_price": "55000",
+        "amount": "55000"
+      },
+      {
+        "description": "採用ページ更新",
+        "quantity": "1",
+        "unit": "式",
+        "unit_price": "38000",
+        "amount": "38000"
+      }
+    ],
+    "confirm_days_ago": null,
+    "copy_of": null
+  },
+  {
+    "id": "I09",
+    "filename": "請求書_北斗オフィスサプライ_明細28行.pdf",
+    "pattern": "明細が多い（2ページ）",
+    "render": "pdf",
+    "document_type": "invoice",
+    "fields": {
+      "issuer_name": "株式会社北斗オフィスサプライ",
+      "recipient_name": "株式会社山田商事",
+      "invoice_number": "HK-26-1102",
+      "issue_date": "2026-11-05",
+      "due_date": "2026-11-30",
+      "registration_number": "T0000000000013",
+      "total_amount": "130768",
+      "subtotal": "118880",
+      "tax_amount": "11888"
+    },
+    "lines": [
+      {
+        "description": "コピー用紙 A4 500枚",
+        "quantity": "1",
+        "unit": "箱",
+        "unit_price": "2980",
+        "amount": "2980"
+      },
+      {
+        "description": "コピー用紙 A3 500枚",
+        "quantity": "2",
+        "unit": "個",
+        "unit_price": "3480",
+        "amount": "6960"
+      },
+      {
+        "description": "ボールペン 黒 10本",
+        "quantity": "3",
+        "unit": "本",
+        "unit_price": "980",
+        "amount": "2940"
+      },
+      {
+        "description": "ボールペン 赤 10本",
+        "quantity": "4",
+        "unit": "冊",
+        "unit_price": "980",
+        "amount": "3920"
+      },
+      {
+        "description": "蛍光ペン 5色セット",
+        "quantity": "5",
+        "unit": "式",
+        "unit_price": "650",
+        "amount": "3250"
+      },
+      {
+        "description": "クリアファイル A4 10枚",
+        "quantity": "1",
+        "unit": "箱",
+        "unit_price": "420",
+        "amount": "420"
+      },
+      {
+        "description": "フラットファイル A4",
+        "quantity": "2",
+        "unit": "個",
+        "unit_price": "120",
+        "amount": "240"
+      },
+      {
+        "description": "ホチキス針 No.10",
+        "quantity": "3",
+        "unit": "本",
+        "unit_price": "220",
+        "amount": "660"
+      },
+      {
+        "description": "付箋 75×75mm",
+        "quantity": "4",
+        "unit": "冊",
+        "unit_price": "380",
+        "amount": "1520"
+      },
+      {
+        "description": "ガムテープ 50mm",
+        "quantity": "5",
+        "unit": "式",
+        "unit_price": "450",
+        "amount": "2250"
+      },
+      {
+        "description": "電池 単3 20本",
+        "quantity": "1",
+        "unit": "箱",
+        "unit_price": "1280",
+        "amount": "1280"
+      },
+      {
+        "description": "ゴミ袋 45L 50枚",
+        "quantity": "2",
+        "unit": "個",
+        "unit_price": "690",
+        "amount": "1380"
+      },
+      {
+        "description": "トイレットペーパー 12ロール",
+        "quantity": "3",
+        "unit": "本",
+        "unit_price": "1980",
+        "amount": "5940"
+      },
+      {
+        "description": "ハンドソープ 詰替",
+        "quantity": "4",
+        "unit": "冊",
+        "unit_price": "540",
+        "amount": "2160"
+      },
+      {
+        "description": "ティッシュ 5箱",
+        "quantity": "5",
+        "unit": "式",
+        "unit_price": "1100",
+        "amount": "5500"
+      },
+      {
+        "description": "紙コップ 100個",
+        "quantity": "1",
+        "unit": "箱",
+        "unit_price": "380",
+        "amount": "380"
+      },
+      {
+        "description": "インクカートリッジ 黒",
+        "quantity": "2",
+        "unit": "個",
+        "unit_price": "3200",
+        "amount": "6400"
+      },
+      {
+        "description": "インクカートリッジ カラー",
+        "quantity": "3",
+        "unit": "本",
+        "unit_price": "4100",
+        "amount": "12300"
+      },
+      {
+        "description": "ラベルシール A4",
+        "quantity": "4",
+        "unit": "冊",
+        "unit_price": "1500",
+        "amount": "6000"
+      },
+      {
+        "description": "OAタップ 6口",
+        "quantity": "5",
+        "unit": "式",
+        "unit_price": "2480",
+        "amount": "12400"
+      },
+      {
+        "description": "LANケーブル 5m",
+        "quantity": "1",
+        "unit": "箱",
+        "unit_price": "780",
+        "amount": "780"
+      },
+      {
+        "description": "USBメモリ 32GB",
+        "quantity": "2",
+        "unit": "個",
+        "unit_price": "1280",
+        "amount": "2560"
+      },
+      {
+        "description": "マウス 無線",
+        "quantity": "3",
+        "unit": "本",
+        "unit_price": "1980",
+        "amount": "5940"
+      },
+      {
+        "description": "キーボード",
+        "quantity": "4",
+        "unit": "冊",
+        "unit_price": "2980",
+        "amount": "11920"
+      },
+      {
+        "description": "デスクマット",
+        "quantity": "5",
+        "unit": "式",
+        "unit_price": "1580",
+        "amount": "7900"
+      },
+      {
+        "description": "モニターアーム",
+        "quantity": "1",
+        "unit": "箱",
+        "unit_price": "6980",
+        "amount": "6980"
+      },
+      {
+        "description": "ホワイトボードマーカー",
+        "quantity": "2",
+        "unit": "個",
+        "unit_price": "640",
+        "amount": "1280"
+      },
+      {
+        "description": "印鑑マット",
+        "quantity": "3",
+        "unit": "本",
+        "unit_price": "880",
+        "amount": "2640"
+      }
+    ],
+    "confirm_days_ago": 10,
+    "copy_of": null
+  },
+  {
+    "id": "I10",
+    "filename": "請求書_みどり運送_3ページ.pdf",
+    "pattern": "複数ページ（3ページ）",
+    "render": "pdf",
+    "document_type": "invoice",
+    "fields": {
+      "issuer_name": "有限会社みどり運送",
+      "recipient_name": "株式会社山田商事",
+      "invoice_number": "MD-2026-1101",
+      "issue_date": "2026-11-01",
+      "due_date": "2026-11-30",
+      "registration_number": "T0000000000020",
+      "total_amount": "201740",
+      "subtotal": "183400",
+      "tax_amount": "18340"
+    },
+    "lines": [
+      {
+        "description": "チャーター便 東京→横浜",
+        "quantity": "4",
+        "unit": "便",
+        "unit_price": "18000",
+        "amount": "72000"
+      },
+      {
+        "description": "チャーター便 東京→千葉",
+        "quantity": "6",
+        "unit": "便",
+        "unit_price": "15000",
+        "amount": "90000"
+      },
+      {
+        "description": "待機料",
+        "quantity": "3",
+        "unit": "時間",
+        "unit_price": "3000",
+        "amount": "9000"
+      },
+      {
+        "description": "高速道路代（実費）",
+        "quantity": "1",
+        "unit": "式",
+        "unit_price": "12400",
+        "amount": "12400"
+      }
+    ],
+    "confirm_days_ago": 15,
+    "copy_of": null
+  },
+  {
+    "id": "I11",
+    "filename": "請求書_大和梱包資材_スキャン.pdf",
+    "pattern": "スキャン形式の PDF",
+    "render": "scan_pdf",
+    "document_type": "invoice",
+    "fields": {
+      "issuer_name": "株式会社大和梱包資材",
+      "recipient_name": "株式会社山田商事",
+      "invoice_number": "DW-58821",
+      "issue_date": "2026-11-08",
+      "due_date": "2026-12-08",
+      "registration_number": "T0000000000017",
+      "total_amount": "62370",
+      "subtotal": "56700",
+      "tax_amount": "5670"
+    },
+    "lines": [
+      {
+        "description": "段ボール箱 60サイズ",
+        "quantity": "300",
+        "unit": "枚",
+        "unit_price": "85",
+        "amount": "25500"
+      },
+      {
+        "description": "緩衝材 エアーキャップ",
+        "quantity": "10",
+        "unit": "巻",
+        "unit_price": "2400",
+        "amount": "24000"
+      },
+      {
+        "description": "OPPテープ 48mm",
+        "quantity": "60",
+        "unit": "巻",
+        "unit_price": "120",
+        "amount": "7200"
+      }
+    ],
+    "confirm_days_ago": null,
+    "copy_of": null
+  },
+  {
+    "id": "I12",
+    "filename": "請求書_あおば清掃_低解像度.jpg",
+    "pattern": "低解像度の画像",
+    "render": "jpeg_low",
+    "document_type": "invoice",
+    "fields": {
+      "issuer_name": "株式会社あおば清掃サービス",
+      "recipient_name": "株式会社山田商事",
+      "invoice_number": "AB-1120",
+      "issue_date": "2026-11-20",
+      "due_date": "2026-12-25",
+      "registration_number": "T0000000000018",
+      "total_amount": "72600",
+      "subtotal": "66000",
+      "tax_amount": "6600"
+    },
+    "lines": [
+      {
+        "description": "定期清掃 11月分",
+        "quantity": "1",
+        "unit": "式",
+        "unit_price": "48000",
+        "amount": "48000"
+      },
+      {
+        "description": "ワックス掛け",
+        "quantity": "120",
+        "unit": "㎡",
+        "unit_price": "150",
+        "amount": "18000"
+      }
+    ],
+    "confirm_days_ago": null,
+    "copy_of": null
+  },
+  {
+    "id": "I13",
+    "filename": "請求書_東和電材_日付なし.pdf",
+    "pattern": "必須項目欠落（発行日なし）",
+    "render": "pdf",
+    "document_type": "invoice",
+    "fields": {
+      "issuer_name": "東和電材株式会社",
+      "recipient_name": "株式会社山田商事",
+      "invoice_number": "INV-2026-0091",
+      "issue_date": null,
+      "due_date": "2026-12-31",
+      "registration_number": "T0000000000011",
+      "total_amount": "86350",
+      "subtotal": "78500",
+      "tax_amount": "7850"
+    },
+    "lines": [
+      {
+        "description": "分電盤 主幹50A",
+        "quantity": "2",
+        "unit": "台",
+        "unit_price": "32000",
+        "amount": "64000"
+      },
+      {
+        "description": "ブレーカー 20A",
+        "quantity": "10",
+        "unit": "個",
+        "unit_price": "1450",
+        "amount": "14500"
+      }
+    ],
+    "confirm_days_ago": null,
+    "copy_of": null
+  },
+  {
+    "id": "I14",
+    "filename": "請求書_北斗オフィスサプライ_値引き送料.pdf",
+    "pattern": "値引き・送料",
+    "render": "pdf",
+    "document_type": "invoice",
+    "fields": {
+      "issuer_name": "株式会社北斗オフィスサプライ",
+      "recipient_name": "株式会社山田商事",
+      "invoice_number": "HK-26-1115",
+      "issue_date": "2026-11-15",
+      "due_date": "2026-12-15",
+      "registration_number": "T0000000000013",
+      "total_amount": "150920",
+      "subtotal": "137200",
+      "tax_amount": "13720",
+      "discount": "-5000",
+      "shipping_fee": "3000"
+    },
+    "lines": [
+      {
+        "description": "オフィスチェア",
+        "quantity": "4",
+        "unit": "脚",
+        "unit_price": "18800",
+        "amount": "75200"
+      },
+      {
+        "description": "デスク 120cm",
+        "quantity": "2",
+        "unit": "台",
+        "unit_price": "32000",
+        "amount": "64000"
+      }
+    ],
+    "confirm_days_ago": 3,
+    "copy_of": null
+  },
+  {
+    "id": "I15",
+    "filename": "請求書_サンライズ印刷_税込.pdf",
+    "pattern": "税込（内税）の請求書",
+    "render": "pdf",
+    "document_type": "invoice",
+    "fields": {
+      "issuer_name": "株式会社サンライズ印刷",
+      "recipient_name": "株式会社山田商事",
+      "invoice_number": "SR-2026-0322",
+      "issue_date": "2026-10-25",
+      "due_date": "2026-11-25",
+      "registration_number": "T0000000000012",
+      "total_amount": "49500",
+      "subtotal": "49500",
+      "tax_amount": "4500"
+    },
+    "lines": [
+      {
+        "description": "ポスター印刷 B2（税込）",
+        "quantity": "50",
+        "unit": "枚",
+        "unit_price": "660",
+        "amount": "33000"
+      },
+      {
+        "description": "パネル加工（税込）",
+        "quantity": "5",
+        "unit": "枚",
+        "unit_price": "3300",
+        "amount": "16500"
+      }
+    ],
+    "confirm_days_ago": 20,
+    "copy_of": null
+  },
+  {
+    "id": "I16",
+    "filename": "請求書_ネクストウェブ_写真.webp",
+    "pattern": "画像（WebP）",
+    "render": "webp_photo",
+    "document_type": "invoice",
+    "fields": {
+      "issuer_name": "合同会社ネクストウェブ",
+      "recipient_name": "株式会社山田商事",
+      "invoice_number": "NW-2026-034",
+      "issue_date": "2026-11-19",
+      "due_date": "2026-12-19",
+      "registration_number": "T0000000000016",
+      "total_amount": "145200",
+      "subtotal": "132000",
+      "tax_amount": "13200"
+    },
+    "lines": [
+      {
+        "description": "LP制作",
+        "quantity": "1",
+        "unit": "式",
+        "unit_price": "120000",
+        "amount": "120000"
+      },
+      {
+        "description": "画像素材購入",
+        "quantity": "3",
+        "unit": "点",
+        "unit_price": "4000",
+        "amount": "12000"
+      }
+    ],
+    "confirm_days_ago": null,
+    "copy_of": null
+  },
+  {
+    "id": "R01",
+    "filename": "領収書_喫茶こもれび.pdf",
+    "pattern": "正常な領収書",
+    "render": "pdf",
+    "document_type": "receipt",
+    "fields": {
+      "issuer_name": "喫茶こもれび",
+      "recipient_name": "株式会社山田商事",
+      "receipt_number": "0472",
+      "issue_date": "2026-11-19",
+      "registration_number": "T0000000000021",
+      "total_amount": "3300",
+      "subtotal": "3000",
+      "tax_amount": "300",
+      "purpose": "会議用飲食代として",
+      "payment_method": "現金"
+    },
+    "lines": [],
+    "confirm_days_ago": 1,
+    "copy_of": null
+  },
+  {
+    "id": "R02",
+    "filename": "領収書_スマイル文具.pdf",
+    "pattern": "但し書きあり",
+    "render": "pdf",
+    "document_type": "receipt",
+    "fields": {
+      "issuer_name": "株式会社スマイル文具",
+      "recipient_name": "株式会社山田商事",
+      "receipt_number": "SM-8812",
+      "issue_date": "2026-11-14",
+      "registration_number": "T0000000000022",
+      "total_amount": "8250",
+      "subtotal": "7500",
+      "tax_amount": "750",
+      "purpose": "文具代として",
+      "payment_method": "現金"
+    },
+    "lines": [],
+    "confirm_days_ago": 6,
+    "copy_of": null
+  },
+  {
+    "id": "R03",
+    "filename": "領収書_はやて交通_タクシー.png",
+    "pattern": "画像（スキャン）",
+    "render": "png_scan",
+    "document_type": "receipt",
+    "fields": {
+      "issuer_name": "はやて交通株式会社",
+      "recipient_name": "株式会社山田商事",
+      "receipt_number": "T-55120",
+      "issue_date": "2026-11-17",
+      "registration_number": "T0000000000023",
+      "total_amount": "4620",
+      "subtotal": "4200",
+      "tax_amount": "420",
+      "purpose": "乗車料金として",
+      "payment_method": "クレジットカード"
+    },
+    "lines": [],
+    "confirm_days_ago": null,
+    "copy_of": null
+  },
+  {
+    "id": "R04",
+    "filename": "レシート_お弁当のまるや.pdf",
+    "pattern": "8%・10% 混在のレシート",
+    "render": "pdf",
+    "document_type": "receipt",
+    "fields": {
+      "issuer_name": "お弁当のまるや 本町店",
+      "receipt_number": "000318",
+      "issue_date": "2026-11-18",
+      "registration_number": "T0000000000024",
+      "total_amount": "5460",
+      "subtotal": "5460",
+      "tax_amount": "410",
+      "payment_method": "現金",
+      "tax_8_base": "5130",
+      "tax_8": "380",
+      "tax_10_base": "330",
+      "tax_10": "30"
+    },
+    "lines": [
+      {
+        "description": "幕の内弁当",
+        "quantity": "5",
+        "unit": null,
+        "unit_price": null,
+        "amount": "4320"
+      },
+      {
+        "description": "緑茶 500ml",
+        "quantity": "5",
+        "unit": null,
+        "unit_price": null,
+        "amount": "810"
+      },
+      {
+        "description": "割り箸セット",
+        "quantity": "1",
+        "unit": null,
+        "unit_price": null,
+        "amount": "330"
+      }
+    ],
+    "confirm_days_ago": 2,
+    "copy_of": null
+  },
+  {
+    "id": "R05",
+    "filename": "領収書_知恵の森書店_低解像度.jpg",
+    "pattern": "低解像度の画像",
+    "render": "jpeg_low",
+    "document_type": "receipt",
+    "fields": {
+      "issuer_name": "株式会社知恵の森書店",
+      "recipient_name": "株式会社山田商事",
+      "receipt_number": "CM-3391",
+      "issue_date": "2026-11-11",
+      "registration_number": "T0000000000025",
+      "total_amount": "6380",
+      "subtotal": "5800",
+      "tax_amount": "580",
+      "purpose": "書籍代として",
+      "payment_method": "現金"
+    },
+    "lines": [],
+    "confirm_days_ago": null,
+    "copy_of": null
+  },
+  {
+    "id": "R06",
+    "filename": "領収書_パークサポート_駐車場.png",
+    "pattern": "画像（PNG）",
+    "render": "png_clean",
+    "document_type": "receipt",
+    "fields": {
+      "issuer_name": "株式会社パークサポート",
+      "recipient_name": "株式会社山田商事",
+      "receipt_number": "P-20261116",
+      "issue_date": "2026-11-16",
+      "registration_number": "T0000000000026",
+      "total_amount": "1800",
+      "subtotal": "1637",
+      "tax_amount": "163",
+      "purpose": "駐車料金として",
+      "payment_method": "現金"
+    },
+    "lines": [],
+    "confirm_days_ago": 4,
+    "copy_of": null
+  },
+  {
+    "id": "R07",
+    "filename": "領収書_発行元なし.pdf",
+    "pattern": "必須項目欠落（発行元なし）",
+    "render": "pdf",
+    "document_type": "receipt",
+    "fields": {
+      "issuer_name": null,
+      "recipient_name": "株式会社山田商事",
+      "receipt_number": "1203",
+      "issue_date": "2026-11-13",
+      "total_amount": "2200",
+      "subtotal": "2000",
+      "tax_amount": "200",
+      "purpose": "お品代として",
+      "payment_method": "現金"
+    },
+    "lines": [],
+    "confirm_days_ago": null,
+    "copy_of": null
+  },
+  {
+    "id": "R08",
+    "filename": "領収書_ホテル架空ステイ.pdf",
+    "pattern": "支払方法（カード）",
+    "render": "pdf",
+    "document_type": "receipt",
+    "fields": {
+      "issuer_name": "ホテル架空ステイ株式会社",
+      "recipient_name": "株式会社山田商事",
+      "receipt_number": "HS-77120",
+      "issue_date": "2026-11-07",
+      "registration_number": "T0000000000027",
+      "total_amount": "15400",
+      "subtotal": "14000",
+      "tax_amount": "1400",
+      "purpose": "宿泊代として",
+      "payment_method": "クレジットカード"
+    },
+    "lines": [],
+    "confirm_days_ago": 12,
+    "copy_of": null
+  },
+  {
+    "id": "R09",
+    "filename": "領収書_読取不可.jpg",
+    "pattern": "読取失敗（ピンぼけ）",
+    "render": "jpeg_unreadable",
+    "document_type": "receipt",
+    "fields": {
+      "issuer_name": "株式会社スマイル文具",
+      "recipient_name": "株式会社山田商事",
+      "receipt_number": "SM-8840",
+      "issue_date": "2026-11-20",
+      "registration_number": "T0000000000022",
+      "total_amount": "1650",
+      "subtotal": "1500",
+      "tax_amount": "150",
+      "purpose": "文具代として",
+      "payment_method": "現金"
+    },
+    "lines": [],
+    "confirm_days_ago": null,
+    "copy_of": null
+  },
+  {
+    "id": "R10",
+    "filename": "領収書_あおば清掃.pdf",
+    "pattern": "正常な領収書",
+    "render": "pdf",
+    "document_type": "receipt",
+    "fields": {
+      "issuer_name": "株式会社あおば清掃サービス",
+      "recipient_name": "株式会社山田商事",
+      "receipt_number": "AB-R-0915",
+      "issue_date": "2026-11-20",
+      "registration_number": "T0000000000018",
+      "total_amount": "22000",
+      "subtotal": "20000",
+      "tax_amount": "2000",
+      "purpose": "エアコン清掃代として",
+      "payment_method": "銀行振込"
+    },
+    "lines": [],
+    "confirm_days_ago": null,
+    "copy_of": null
+  },
+  {
+    "id": "D01",
+    "filename": "納品書_東和電材_DN-5521.pdf",
+    "pattern": "正常な納品書",
+    "render": "pdf",
+    "document_type": "delivery_note",
+    "fields": {
+      "issuer_name": "東和電材株式会社",
+      "recipient_name": "株式会社山田商事",
+      "delivery_number": "DN-5521",
+      "delivery_date": "2026-11-18",
+      "total_amount": "137500",
+      "subtotal": "125000",
+      "tax_amount": "12500"
+    },
+    "lines": [
+      {
+        "description": "VVFケーブル 2.0mm×3C 100m",
+        "quantity": "4",
+        "unit": "巻",
+        "unit_price": "12800",
+        "amount": "51200"
+      },
+      {
+        "description": "スイッチボックス 1個用",
+        "quantity": "50",
+        "unit": "個",
+        "unit_price": "180",
+        "amount": "9000"
+      },
+      {
+        "description": "LED照明器具 40W形",
+        "quantity": "12",
+        "unit": "台",
+        "unit_price": "5400",
+        "amount": "64800"
+      }
+    ],
+    "confirm_days_ago": 2,
+    "copy_of": null
+  },
+  {
+    "id": "D02",
+    "filename": "納品書_大和梱包資材_N-30418.pdf",
+    "pattern": "正常な納品書",
+    "render": "pdf",
+    "document_type": "delivery_note",
+    "fields": {
+      "issuer_name": "株式会社大和梱包資材",
+      "recipient_name": "株式会社山田商事",
+      "delivery_number": "N-30418",
+      "delivery_date": "2026-11-06",
+      "total_amount": "62370",
+      "subtotal": "56700",
+      "tax_amount": "5670"
+    },
+    "lines": [
+      {
+        "description": "段ボール箱 60サイズ",
+        "quantity": "300",
+        "unit": "枚",
+        "unit_price": "85",
+        "amount": "25500"
+      },
+      {
+        "description": "緩衝材 エアーキャップ",
+        "quantity": "10",
+        "unit": "巻",
+        "unit_price": "2400",
+        "amount": "24000"
+      },
+      {
+        "description": "OPPテープ 48mm",
+        "quantity": "60",
+        "unit": "巻",
+        "unit_price": "120",
+        "amount": "7200"
+      }
+    ],
+    "confirm_days_ago": 14,
+    "copy_of": null
+  },
+  {
+    "id": "D03",
+    "filename": "納品書_三和工具_数量単価不一致.pdf",
+    "pattern": "金額不一致（数量×単価）",
+    "render": "pdf",
+    "document_type": "delivery_note",
+    "fields": {
+      "issuer_name": "株式会社三和工具",
+      "recipient_name": "株式会社山田商事",
+      "delivery_number": "SW-D-0455",
+      "delivery_date": "2026-11-16",
+      "total_amount": "74800",
+      "subtotal": "68000",
+      "tax_amount": "6800"
+    },
+    "lines": [
+      {
+        "description": "インパクトドライバー",
+        "quantity": "2",
+        "unit": "台",
+        "unit_price": "24800",
+        "amount": "49600"
+      },
+      {
+        "description": "ドリルビットセット",
+        "quantity": "3",
+        "unit": "セット",
+        "unit_price": "3600",
+        "amount": "12800"
+      },
+      {
+        "description": "作業用手袋",
+        "quantity": "20",
+        "unit": "双",
+        "unit_price": "280",
+        "amount": "5600"
+      }
+    ],
+    "confirm_days_ago": null,
+    "copy_of": null
+  },
+  {
+    "id": "D04",
+    "filename": "納品書_グリーンテック設備_日付なし.pdf",
+    "pattern": "必須項目欠落（納品日なし）",
+    "render": "pdf",
+    "document_type": "delivery_note",
+    "fields": {
+      "issuer_name": "株式会社グリーンテック設備",
+      "recipient_name": "株式会社山田商事",
+      "delivery_number": "GT-D-0770",
+      "delivery_date": null,
+      "total_amount": "55000",
+      "subtotal": "50000",
+      "tax_amount": "5000"
+    },
+    "lines": [
+      {
+        "description": "エアコンフィルター交換",
+        "quantity": "6",
+        "unit": "台",
+        "unit_price": "4500",
+        "amount": "27000"
+      },
+      {
+        "description": "ドレン配管清掃",
+        "quantity": "6",
+        "unit": "台",
+        "unit_price": "3000",
+        "amount": "18000"
+      },
+      {
+        "description": "出張費",
+        "quantity": "1",
+        "unit": "式",
+        "unit_price": "5000",
+        "amount": "5000"
+      }
+    ],
+    "confirm_days_ago": null,
+    "copy_of": null
+  },
+  {
+    "id": "D05",
+    "filename": "納品書_みどり運送_スキャン.png",
+    "pattern": "画像（スキャン）",
+    "render": "png_scan",
+    "document_type": "delivery_note",
+    "fields": {
+      "issuer_name": "有限会社みどり運送",
+      "recipient_name": "株式会社山田商事",
+      "delivery_number": "MD-N-1107",
+      "delivery_date": "2026-11-07",
+      "total_amount": "7700",
+      "subtotal": "7000",
+      "tax_amount": "700"
+    },
+    "lines": [
+      {
+        "description": "パレット回収",
+        "quantity": "8",
+        "unit": "枚",
+        "unit_price": "500",
+        "amount": "4000"
+      },
+      {
+        "description": "梱包資材回収",
+        "quantity": "1",
+        "unit": "式",
+        "unit_price": "3000",
+        "amount": "3000"
+      }
+    ],
+    "confirm_days_ago": null,
+    "copy_of": null
+  },
+  {
+    "id": "D06",
+    "filename": "納品書_北斗オフィスサプライ_明細22行.pdf",
+    "pattern": "明細が多い（2ページ）",
+    "render": "pdf",
+    "document_type": "delivery_note",
+    "fields": {
+      "issuer_name": "株式会社北斗オフィスサプライ",
+      "recipient_name": "株式会社山田商事",
+      "delivery_number": "HK-N-26-1103",
+      "delivery_date": "2026-11-03",
+      "total_amount": "90442",
+      "subtotal": "82220",
+      "tax_amount": "8222"
+    },
+    "lines": [
+      {
+        "description": "コピー用紙 A4 500枚",
+        "quantity": "1",
+        "unit": "箱",
+        "unit_price": "2980",
+        "amount": "2980"
+      },
+      {
+        "description": "コピー用紙 A3 500枚",
+        "quantity": "2",
+        "unit": "個",
+        "unit_price": "3480",
+        "amount": "6960"
+      },
+      {
+        "description": "ボールペン 黒 10本",
+        "quantity": "3",
+        "unit": "本",
+        "unit_price": "980",
+        "amount": "2940"
+      },
+      {
+        "description": "ボールペン 赤 10本",
+        "quantity": "4",
+        "unit": "冊",
+        "unit_price": "980",
+        "amount": "3920"
+      },
+      {
+        "description": "蛍光ペン 5色セット",
+        "quantity": "5",
+        "unit": "式",
+        "unit_price": "650",
+        "amount": "3250"
+      },
+      {
+        "description": "クリアファイル A4 10枚",
+        "quantity": "1",
+        "unit": "箱",
+        "unit_price": "420",
+        "amount": "420"
+      },
+      {
+        "description": "フラットファイル A4",
+        "quantity": "2",
+        "unit": "個",
+        "unit_price": "120",
+        "amount": "240"
+      },
+      {
+        "description": "ホチキス針 No.10",
+        "quantity": "3",
+        "unit": "本",
+        "unit_price": "220",
+        "amount": "660"
+      },
+      {
+        "description": "付箋 75×75mm",
+        "quantity": "4",
+        "unit": "冊",
+        "unit_price": "380",
+        "amount": "1520"
+      },
+      {
+        "description": "ガムテープ 50mm",
+        "quantity": "5",
+        "unit": "式",
+        "unit_price": "450",
+        "amount": "2250"
+      },
+      {
+        "description": "電池 単3 20本",
+        "quantity": "1",
+        "unit": "箱",
+        "unit_price": "1280",
+        "amount": "1280"
+      },
+      {
+        "description": "ゴミ袋 45L 50枚",
+        "quantity": "2",
+        "unit": "個",
+        "unit_price": "690",
+        "amount": "1380"
+      },
+      {
+        "description": "トイレットペーパー 12ロール",
+        "quantity": "3",
+        "unit": "本",
+        "unit_price": "1980",
+        "amount": "5940"
+      },
+      {
+        "description": "ハンドソープ 詰替",
+        "quantity": "4",
+        "unit": "冊",
+        "unit_price": "540",
+        "amount": "2160"
+      },
+      {
+        "description": "ティッシュ 5箱",
+        "quantity": "5",
+        "unit": "式",
+        "unit_price": "1100",
+        "amount": "5500"
+      },
+      {
+        "description": "紙コップ 100個",
+        "quantity": "1",
+        "unit": "箱",
+        "unit_price": "380",
+        "amount": "380"
+      },
+      {
+        "description": "インクカートリッジ 黒",
+        "quantity": "2",
+        "unit": "個",
+        "unit_price": "3200",
+        "amount": "6400"
+      },
+      {
+        "description": "インクカートリッジ カラー",
+        "quantity": "3",
+        "unit": "本",
+        "unit_price": "4100",
+        "amount": "12300"
+      },
+      {
+        "description": "ラベルシール A4",
+        "quantity": "4",
+        "unit": "冊",
+        "unit_price": "1500",
+        "amount": "6000"
+      },
+      {
+        "description": "OAタップ 6口",
+        "quantity": "5",
+        "unit": "式",
+        "unit_price": "2480",
+        "amount": "12400"
+      },
+      {
+        "description": "LANケーブル 5m",
+        "quantity": "1",
+        "unit": "箱",
+        "unit_price": "780",
+        "amount": "780"
+      },
+      {
+        "description": "USBメモリ 32GB",
+        "quantity": "2",
+        "unit": "個",
+        "unit_price": "1280",
+        "amount": "2560"
+      }
+    ],
+    "confirm_days_ago": 16,
+    "copy_of": null
+  },
+  {
+    "id": "D07",
+    "filename": "納品書_サンライズ印刷_数量のみ.pdf",
+    "pattern": "金額の記載なし",
+    "render": "pdf",
+    "document_type": "delivery_note",
+    "fields": {
+      "issuer_name": "株式会社サンライズ印刷",
+      "recipient_name": "株式会社山田商事",
+      "delivery_number": "SR-N-0098",
+      "delivery_date": "2026-11-09",
+      "total_amount": null,
+      "subtotal": null,
+      "tax_amount": null
+    },
+    "lines": [
+      {
+        "description": "会社案内パンフレット A4 8P",
+        "quantity": "1000",
+        "unit": "部",
+        "unit_price": null,
+        "amount": null
+      },
+      {
+        "description": "封筒 長3 社名入り",
+        "quantity": "2000",
+        "unit": "枚",
+        "unit_price": null,
+        "amount": null
+      }
+    ],
+    "confirm_days_ago": 11,
+    "copy_of": null
+  },
+  {
+    "id": "D08",
+    "filename": "納品書_丸栄食品_軽減税率.pdf",
+    "pattern": "8%・10% 混在",
+    "render": "pdf",
+    "document_type": "delivery_note",
+    "fields": {
+      "issuer_name": "丸栄食品株式会社",
+      "recipient_name": "株式会社山田商事",
+      "delivery_number": "MF-N-7730",
+      "delivery_date": "2026-11-15",
+      "total_amount": "33176",
+      "subtotal": "30600",
+      "tax_amount": "2576",
+      "tax_8_base": "24200",
+      "tax_8": "1936",
+      "tax_10_base": "6400",
+      "tax_10": "640"
+    },
+    "lines": [
+      {
+        "description": "業務用コーヒー豆 1kg",
+        "quantity": "6",
+        "unit": "袋",
+        "unit_price": "2400",
+        "amount": "14400"
+      },
+      {
+        "description": "緑茶ティーバッグ 100P",
+        "quantity": "10",
+        "unit": "箱",
+        "unit_price": "980",
+        "amount": "9800"
+      },
+      {
+        "description": "紙コップ 205ml 1000個",
+        "quantity": "2",
+        "unit": "箱",
+        "unit_price": "3200",
+        "amount": "6400"
+      }
+    ],
+    "confirm_days_ago": null,
+    "copy_of": null
+  },
+  {
+    "id": "D09",
+    "filename": "納品書_あおば清掃_低解像度.jpg",
+    "pattern": "低解像度の画像",
+    "render": "jpeg_low",
+    "document_type": "delivery_note",
+    "fields": {
+      "issuer_name": "株式会社あおば清掃サービス",
+      "recipient_name": "株式会社山田商事",
+      "delivery_number": "AB-N-1120",
+      "delivery_date": "2026-11-20",
+      "total_amount": "18260",
+      "subtotal": "16600",
+      "tax_amount": "1660"
+    },
+    "lines": [
+      {
+        "description": "清掃用洗剤 業務用",
+        "quantity": "4",
+        "unit": "本",
+        "unit_price": "2800",
+        "amount": "11200"
+      },
+      {
+        "description": "モップ替え糸",
+        "quantity": "6",
+        "unit": "枚",
+        "unit_price": "900",
+        "amount": "5400"
+      }
+    ],
+    "confirm_days_ago": null,
+    "copy_of": null
+  },
+  {
+    "id": "D10",
+    "filename": "納品書_グリーンテック設備_GT-D-0781.pdf",
+    "pattern": "正常な納品書",
+    "render": "pdf",
+    "document_type": "delivery_note",
+    "fields": {
+      "issuer_name": "株式会社グリーンテック設備",
+      "recipient_name": "株式会社山田商事",
+      "delivery_number": "GT-D-0781",
+      "delivery_date": "2026-11-19",
+      "total_amount": "46860",
+      "subtotal": "42600",
+      "tax_amount": "4260"
+    },
+    "lines": [
+      {
+        "description": "換気扇 交換用",
+        "quantity": "3",
+        "unit": "台",
+        "unit_price": "12800",
+        "amount": "38400"
+      },
+      {
+        "description": "取付部材一式",
+        "quantity": "1",
+        "unit": "式",
+        "unit_price": "4200",
+        "amount": "4200"
+      }
+    ],
+    "confirm_days_ago": null,
+    "copy_of": null
+  },
+  {
+    "id": "U01",
+    "filename": "見積書_ネクストウェブ.pdf",
+    "pattern": "対象外の書類（見積書）",
+    "render": "pdf",
+    "document_type": "unknown",
+    "fields": {},
+    "lines": [
+      {
+        "description": "ECサイト構築",
+        "quantity": "1",
+        "unit": "式",
+        "unit_price": "680000",
+        "amount": "680000"
+      }
+    ],
+    "confirm_days_ago": null,
+    "copy_of": null
+  }
+]
