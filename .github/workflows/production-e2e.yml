@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
     inputs:
       base_url:
-        description: 公開した URL（例：https://docflow.vercel.app）
+        description: 公開した URL（例：https://docflow-mu-beige.vercel.app）
         required: true
         type: string
 
