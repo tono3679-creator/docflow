@@ -12,6 +12,7 @@ const OCR_FILES = [
   "./node_modules/tesseract.js/**/*",
   "./node_modules/tesseract.js-core/**/*",
   "./node_modules/@tesseract.js-data/jpn/4.0.0/**/*",
+  "./node_modules/@tesseract.js-data/eng/4.0.0_best_int/**/*",
   "./node_modules/{bmp-js,is-url,node-fetch,regenerator-runtime,wasm-feature-detect,zlibjs,idb-keyval,whatwg-url,tr46,webidl-conversions}/**/*",
   "./node_modules/pdfjs-dist/legacy/build/**/*",
   "./node_modules/pdfjs-dist/cmaps/**/*",

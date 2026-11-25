@@ -247,4 +247,48 @@ describe("OCR の読み違いへの対応", () => {
     expect(field(r, "unit_price", 0)).toBe("2800");
     expect(field(r, "amount", 0)).toBe("11200");
   });
+
+  it("数字の無い1文字や記号だけの読み取り（「)」「:」）は値にせず未取得。「一式」のような記載は残す", async () => {
+    const r = await analyzePages([ocrPage([
+      ocrWord("請求書", 0.45, 0.05),
+      ocrWord("品名", 0.1, 0.3), ocrWord("数量", 0.5, 0.3), ocrWord("単位", 0.58, 0.3), ocrWord("単価", 0.72, 0.3), ocrWord("金額", 0.88, 0.3),
+      ocrWord("採用ページ更新", 0.1, 0.34), ocrWord(")", 0.53, 0.34), ocrWord(":", 0.6, 0.34), ocrWord("38,000", 0.72, 0.34), ocrWord("38,000", 0.86, 0.34),
+      ocrWord("設置工事", 0.1, 0.37), ocrWord("一式", 0.5, 0.37), ocrWord("10,000", 0.86, 0.37),
+      ocrWord("小計", 0.6, 0.45), ocrWord("¥48,000", 0.84, 0.45),
+    ])], { allowLlm: false });
+    expect(field(r, "quantity", 0)).toBeNull();
+    expect(field(r, "unit", 0)).toBeNull();
+    expect(field(r, "unit_price", 0)).toBe("38000");
+    expect(field(r, "quantity", 1)).toBe("一式");
+  });
+});
+
+describe("品名の表記（原本の空白を残す）", () => {
+  const field = (r: Awaited<ReturnType<typeof analyzePages>>, key: string, line: number | null = null) => r.output.fields.find((f) => f.key === key && f.line === line)?.value ?? null;
+  // 幅 1000・高さ 1400 のページで文字の高さ 0.02 → 横の比率で 0.028。単語の幅は文字数 × 0.014（半角は狭いが、ここでは揃える）
+  const at = (text: string, x: number, y: number, conf: number | null) => ({ text, box: { x, y, w: 0.014 * text.length, h: 0.02 }, conf });
+  const table = (source: "pdf_text" | "ocr", desc: { text: string; gap: number }[]): PageText => {
+    const conf = source === "ocr" ? 0.95 : null;
+    const words = [at("請求書", 0.45, 0.05, conf), at("品名", 0.1, 0.3, conf), at("数量", 0.5, 0.3, conf), at("単価", 0.72, 0.3, conf), at("金額", 0.88, 0.3, conf)];
+    let x = 0.1;
+    for (const d of desc) {
+      x += d.gap * 0.028;
+      words.push(at(d.text, x, 0.34, conf));
+      x += 0.014 * d.text.length;
+    }
+    words.push(at("2", 0.53, 0.34, conf), at("500", 0.72, 0.34, conf), at("1,000", 0.86, 0.34, conf));
+    return { page: 1, width: 1000, height: 1400, source, engine: "test", words };
+  };
+
+  it("PDF：原本の空白はそのまま（「コピー用紙A4500枚」にしない・日本語どうしの間も残す）", async () => {
+    const r = await analyzePages([table("pdf_text", [{ text: "コピー用紙", gap: 0 }, { text: "A4", gap: 0.53 }, { text: "500枚", gap: 0.53 }])], { allowLlm: false });
+    expect(field(r, "description", 0)).toBe("コピー用紙 A4 500枚");
+    const r2 = await analyzePages([table("pdf_text", [{ text: "ボールペン", gap: 0 }, { text: "黒", gap: 0.54 }, { text: "10本", gap: 0.54 }])], { allowLlm: false });
+    expect(field(r2, "description", 0)).toBe("ボールペン 黒 10本");
+  });
+
+  it("OCR：日本語→数字の間が空いていれば空白、数字→日本語（「11月」）はつなげる、日本語どうしの間の空白は除く", async () => {
+    const r = await analyzePages([table("ocr", [{ text: "定期", gap: 0 }, { text: "清掃", gap: 0.6 }, { text: "11", gap: 0.45 }, { text: "月分", gap: 0.59 }])], { allowLlm: false });
+    expect(field(r, "description", 0)).toBe("定期清掃 11月分");
+  });
 });

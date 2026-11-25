@@ -36,12 +36,17 @@ function flaggedKeys(r: Result): Set<string> {
 }
 
 const same = (a: string | null, b: string | null) => a !== null && b !== null && compactKey(a) === compactKey(b);
+/** 文字の項目（品名・会社名など）：画面に出る文字が、空白の位置も含めて正解と同じか */
+const TEXT_KEYS = new Set(["description", "issuer_name", "recipient_name", "purpose", "payment_method"]);
+const shownForm = (s: string) => s.normalize("NFKC").replace(/\s+/g, " ").trim();
+const exact = (a: string | null, b: string) => a !== null && shownForm(a) === shownForm(b);
 
 async function main() {
   const truth: Truth[] = JSON.parse(await readFile(path.join(ROOT, "demo/ground-truth.json"), "utf8"));
   let typeOk = 0;
   const f = { total: 0, correct: 0, wrong: 0, missing: 0, invented: 0, located: 0, wrongFlagged: 0, correctFlagged: 0 };
   const l = { total: 0, correct: 0 };
+  const shown = { total: 0, exact: 0 };
   const byRender = new Map<string, { total: number; correct: number }>();
   const rows: string[] = [];
   for (const t of truth) {
@@ -65,6 +70,11 @@ async function main() {
         f.missing++;
         if (detail) rows.push(`  ${t.id} ${key}: 未取得（正解 ${expected}）`);
       } else if (same(got.value, expected)) {
+        if (TEXT_KEYS.has(key)) {
+          shown.total++;
+          if (exact(got.value, expected)) shown.exact++;
+          else if (detail) rows.push(`  ${t.id} ${key}: 表記「${got.value}」（正解 ${expected}）`);
+        }
         f.correct++;
         dc++;
         if (got.source) f.located++;
@@ -83,7 +93,14 @@ async function main() {
         if (expected === null) continue;
         l.total++;
         const got = lines.find((x) => x.line === i && x.key === key);
-        if (got && same(got.value, expected)) l.correct++;
+        if (got && same(got.value, expected)) {
+          l.correct++;
+          if (TEXT_KEYS.has(key)) {
+            shown.total++;
+            if (exact(got.value, expected)) shown.exact++;
+            else if (detail) rows.push(`  ${t.id} 明細${i + 1}.${key}: 表記「${got.value}」（正解 ${expected}）`);
+          }
+        }
         else if (detail) rows.push(`  ${t.id} 明細${i + 1}.${key}: 「${got?.value ?? "未取得"}」（正解 ${expected}）`);
       }
     });
@@ -108,6 +125,7 @@ async function main() {
     `| 誤りの項目のうち「要確認」「不整合」として示された数 | ${f.wrongFlagged} / ${f.wrong} |`,
     `| 正解の項目のうち「要確認」になった数（念のための確認） | ${f.correctFlagged} / ${f.correct} |`,
     `| 明細の値（品名・数量・単位・単価・金額） | 正解 ${l.correct} / ${l.total}（${pct(l.correct, l.total)}） |`,
+    `| 正解した文字の項目（品名・会社名など）のうち、空白の位置も含めて原本と同じ表記の数 | ${shown.exact} / ${shown.total} |`,
     ``,
     `書類の形式ごとの見出し項目の正解率：`,
     ``,
