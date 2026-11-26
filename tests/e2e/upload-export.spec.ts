@@ -61,11 +61,42 @@ test("処理済みの書類を Excel と CSV に出力する", async ({ page }) 
 
   await page.getByRole("button", { name: "出力" }).click();
   await dialog.getByRole("radio", { name: /CSV/ }).click();
-  await dialog.getByRole("radio", { name: "請求書" }).click();
+  await dialog.getByRole("radio", { name: /請求書/ }).click();
   const [csv] = await Promise.all([page.waitForEvent("download"), dialog.getByRole("button", { name: "出力する" }).click()]);
   expect(csv.suggestedFilename()).toMatch(/\.csv$/);
   const bytes = await readFile((await csv.path())!);
   expect([...bytes.subarray(0, 3)]).toEqual([0xef, 0xbb, 0xbf]);
   const text = bytes.subarray(3).toString("utf8");
-  expect(text.split(/\r?\n/)[0]).toContain("発行元");
+  const rows = text.split(/\r?\n/).filter(Boolean);
+  expect(rows[0]).toContain("発行元");
+  // 見出しだけでなく、処理済みの請求書の行が入っている（発行元・合計の列に値がある）
+  expect(rows.length).toBeGreaterThan(1);
+  const header = rows[0].split(",");
+  const first = rows[1].split(",");
+  expect(first[header.indexOf("状態")]).toBe("処理済み");
+  expect(first[header.indexOf("発行元")]).not.toBe("");
+  expect(Number(first[header.indexOf("合計")])).toBeGreaterThan(0);
+});
+
+test("出力する行が無い内容は選べず、理由を示す（見出しだけのファイルを渡さない）", async ({ page }) => {
+  await startDemo(page, "staff");
+  await page.goto("/documents?type=receipt");
+  await page.getByRole("checkbox", { name: /領収書_.*を選択/ }).first().check();
+  await page.getByRole("button", { name: "出力" }).click();
+  const dialog = page.getByRole("dialog", { name: "出力" });
+  await dialog.getByRole("radio", { name: /CSV/ }).click();
+  await dialog.getByRole("radio", { name: /請求書/ }).click();
+  await expect(dialog.getByRole("radio", { name: /請求書/ })).toContainText("0件");
+  await expect(dialog.getByTestId("export-empty")).toContainText("選んだ書類に請求書がありません");
+  await expect(dialog.getByRole("button", { name: "出力する" })).toBeDisabled();
+  // 領収書なら出せる
+  await dialog.getByRole("radio", { name: /領収書/ }).click();
+  await expect(dialog.getByRole("radio", { name: /領収書/ })).toContainText("1件");
+  await expect(dialog.getByRole("button", { name: "出力する" })).toBeEnabled();
+  // API を直接呼んでも、見出しだけの CSV は返さない
+  const href = await page.locator('a[href^="/documents/"]').filter({ hasText: /領収書_/ }).first().getAttribute("href");
+  const id = href!.split("/").pop()!.split("?")[0];
+  const res = await page.request.post("/api/export", { data: { format: "csv", target: "invoice", ids: [id] } });
+  expect(res.status()).toBe(400);
+  expect((await res.json()).error).toContain("選んだ書類に請求書がありません");
 });

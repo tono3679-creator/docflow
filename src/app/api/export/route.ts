@@ -2,7 +2,8 @@ import { z } from "zod";
 import { asCurrentUser, getCurrentUser } from "@/lib/auth";
 import { listDocuments } from "@/lib/data/documents";
 import { can } from "@/lib/domain/labels";
-import { buildSheets, loadExportData, sheetToCsv, sheetsToXlsx, type ExportTarget } from "@/lib/export";
+import type { Tx } from "@/lib/db";
+import { buildSheets, EXPORT_TARGET_LABEL, loadExportData, sheetToCsv, sheetsToXlsx, type ExportTarget } from "@/lib/export";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -20,12 +21,33 @@ const schema = z.object({
     from: z.string().max(10).optional(),
     to: z.string().max(10).optional(),
   }).optional(),
+  /** true：出力せず、条件に合う件数（種別ごとの行数）だけ返す（出力の画面で、押す前に件数を見せるため） */
+  preview: z.boolean().optional(),
 });
+type Input = z.infer<typeof schema>;
+
+const ALL_TARGETS: ExportTarget[] = ["invoice", "receipt", "delivery_note", "lines"];
+
+/** 出力する書類：選んだ書類、または一覧の絞り込み条件に合う書類 */
+async function resolveIds(tx: Tx, input: Input): Promise<string[]> {
+  if (input.ids && input.ids.length > 0) return input.ids;
+  const { rows } = await listDocuments(tx, { ...input.filter, perPage: MAX_DOCS });
+  return rows.map((r) => r.id);
+}
+
+/** 行が1つも無いときの説明（見出しだけのファイルは渡さない） */
+function emptyMessage(input: Input): string {
+  const what = input.target === "all" ? "書類" : EXPORT_TARGET_LABEL[input.target];
+  if (input.ids && input.ids.length > 0) return `選んだ書類に${what}がありません`;
+  if (input.filter?.status === "confirmed") return `処理済み（確定した）${what}がありません。「処理済みだけ」を外すと、確認中の書類も出力できます`;
+  return `条件に合う${what}がありません`;
+}
 
 /**
  * 出力（POST・JSON）。選んだ書類（ids）か、一覧の絞り込み条件（filter）に合う書類を出す。
  * Excel は種別ごとのシート＋明細のシート。CSV は1つの種別（または明細）だけ（UTF-8 BOM 付き）。
  * 閲覧者は出力できない（データの持ち出しは担当者・管理者だけ）。出力したことは記録する。
+ * 出力する行が1つも無ければ、見出しだけのファイルは渡さず、理由を返す（400）。
  */
 export async function POST(request: Request) {
   const user = await getCurrentUser();
@@ -38,21 +60,28 @@ export async function POST(request: Request) {
   const { format, target } = parsed.data;
   if (format === "csv" && target === "all") return Response.json({ error: "CSV は書類種別（または明細）を1つ選んでください" }, { status: 400 });
 
+  if (parsed.data.preview) {
+    const counts = await asCurrentUser(async (tx) => {
+      const ids = await resolveIds(tx, parsed.data);
+      const data = ids.length > 0 ? await loadExportData(tx, ids) : { docs: [], fields: [] };
+      const sheets = buildSheets(data, ALL_TARGETS);
+      return { documents: data.docs.length, ...Object.fromEntries(ALL_TARGETS.map((t, i) => [t, sheets[i].rows.length])) };
+    });
+    return Response.json(counts, { headers: { "cache-control": "no-store" } });
+  }
+
   const out = await asCurrentUser(async (tx) => {
-    let ids = parsed.data.ids ?? [];
-    if (ids.length === 0) {
-      const { rows } = await listDocuments(tx, { ...parsed.data.filter, perPage: MAX_DOCS });
-      ids = rows.map((r) => r.id);
-    }
+    const ids = await resolveIds(tx, parsed.data);
     if (ids.length === 0) return null;
     const data = await loadExportData(tx, ids);
-    const targets: ExportTarget[] = target === "all" ? ["invoice", "receipt", "delivery_note", "lines"] : [target];
+    const targets: ExportTarget[] = target === "all" ? ALL_TARGETS : [target];
     const sheets = buildSheets(data, targets).filter((s) => target !== "all" || s.rows.length > 0);
     const rowCount = sheets.reduce((n, s) => n + s.rows.length, 0);
+    if (rowCount === 0) return null;
     await tx`select record_export(${format}, ${target}, ${data.docs.map((d) => d.id)}::uuid[], ${rowCount})`;
     return { sheets, rowCount };
   });
-  if (!out || out.sheets.length === 0) return Response.json({ error: "出力する書類がありません" }, { status: 400 });
+  if (!out || out.sheets.length === 0) return Response.json({ error: emptyMessage(parsed.data) }, { status: 400 });
 
   const stamp = new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Tokyo", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date()).replace(/-/g, "");
   const name = `DocFlow_${target === "all" ? "書類" : out.sheets[0].name}_${stamp}.${format}`;
