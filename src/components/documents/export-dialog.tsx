@@ -16,6 +16,7 @@ const TARGETS = [
   { value: "delivery_note", label: "納品書" },
   { value: "lines", label: "明細" },
 ] as const;
+const DOC_TARGETS = ["invoice", "receipt", "delivery_note"] as const;
 
 function Choice({ checked, onClick, children }: { checked: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
@@ -34,7 +35,8 @@ function Choice({ checked, onClick, children }: { checked: boolean; onClick: () 
 /** 出力：Excel（種別ごとのシート＋明細）または CSV（種別を1つ）。選んだ書類か、今の絞り込み条件に合う書類 */
 export function ExportDialog({ open, onOpenChange, ids, filter, total }: { open: boolean; onOpenChange: (v: boolean) => void; ids: string[]; filter: Filter; total: number }) {
   const [format, setFormat] = useState<"xlsx" | "csv">("xlsx");
-  const [target, setTarget] = useState<string>("invoice");
+  // CSV の内容。自分で選ぶまでは、対象の書類にいちばん多い種別を選んでおく（下の auto）
+  const [picked, setPicked] = useState<string | null>(null);
   const [confirmedOnly, setConfirmedOnly] = useState(true);
   const [busy, setBusy] = useState(false);
   const [loaded, setLoaded] = useState<{ key: string; counts: Counts } | null>(null);
@@ -62,10 +64,21 @@ export function ExportDialog({ open, onOpenChange, ids, filter, total }: { open:
     };
   }, [open, scopeKey]);
   const counts = loaded?.key === scopeKey ? loaded.counts : null;
+  // 閉じたら、自分で選んだ内容も忘れる（次に別の書類を選んで開いたときは、その種別に合わせる）
+  useEffect(() => {
+    if (!open) return;
+    return () => setPicked(null);
+  }, [open]);
+
+  // 納品書だけをチェックして開いたら「納品書」。種別が混ざっていれば件数の多い種別（同じなら請求書・領収書・納品書の順）
+  const auto = counts === null ? "invoice" : DOC_TARGETS.reduce((best, t) => (counts[t] > counts[best] ? t : best));
+  const target = picked ?? auto;
 
   const chosen = counts === null ? null : format === "csv" ? counts[target as keyof Counts] : counts.invoice + counts.receipt + counts.delivery_note;
   const targetLabel = format === "csv" ? (TARGETS.find((t) => t.value === target)?.label ?? "") : "書類";
   const countText = (t: (typeof TARGETS)[number]["value"]) => (counts === null ? "…" : t === "lines" ? `${counts.lines}行` : `${counts[t]}件`);
+  // 対象に入っている種別（0 件のとき、何なら出せるかを示す）
+  const present = counts === null ? "" : DOC_TARGETS.filter((t) => counts[t] > 0).map((t) => `${TARGETS.find((x) => x.value === t)?.label} ${counts[t]}件`).join("・");
 
   const run = async () => {
     setBusy(true);
@@ -116,7 +129,7 @@ export function ExportDialog({ open, onOpenChange, ids, filter, total }: { open:
               <Label>内容</Label>
               <div className="grid grid-cols-4 gap-2" role="radiogroup" aria-label="内容">
                 {TARGETS.map((t) => (
-                  <Choice key={t.value} checked={target === t.value} onClick={() => setTarget(t.value)}>
+                  <Choice key={t.value} checked={target === t.value} onClick={() => setPicked(t.value)}>
                     {t.label}
                     <span className="block text-xs font-normal text-muted-foreground">{countText(t.value)}</span>
                   </Choice>
@@ -135,7 +148,7 @@ export function ExportDialog({ open, onOpenChange, ids, filter, total }: { open:
           )}
           {chosen === 0 && (
             <p className="rounded-md bg-warning-soft px-3 py-2 text-sm text-warning-strong" role="status" data-testid="export-empty">
-              {bySelection ? `選んだ書類に${targetLabel}がありません。` : `${confirmedOnly ? "処理済み（確定した）" : "条件に合う"}${targetLabel}がありません。`}
+              {bySelection ? `選んだ書類に${targetLabel}がありません${present ? `（${present}）` : ""}。` : `${confirmedOnly ? "処理済み（確定した）" : "条件に合う"}${targetLabel}がありません。`}
               {!bySelection && confirmedOnly && "「処理済みだけ」を外すと、確認中の書類も出力できます。"}
             </p>
           )}
